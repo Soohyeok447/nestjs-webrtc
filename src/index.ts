@@ -14,7 +14,7 @@ const app: Express = express();
 const port = process.env.PORT;
 // const httpServer = createServer(app);
 
-const apiVersion = 'v1';  // API 버전
+const apiVersion = 'v1';
 const apiEndPoint = `/api/${apiVersion}`;
 
 app.use(bodyParser.json());
@@ -41,7 +41,7 @@ app.post(`${apiEndPoint}/avatars`, upload.array('avatars'), async (req, res) => 
 
       await storage.putObject(params, (_, __) => null).promise();
 
-      resizedImageUrls.push(`https://haze-dev-8901.s3.ap-northeast-2.amazonaws.com/resized/${key}`);
+      resizedImageUrls.push(`https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/resized/${key}`);
     }
 
     res.json({ result: 'success', urls: resizedImageUrls });
@@ -70,7 +70,7 @@ app.post(`${apiEndPoint}/avatar`, upload.single('avatar'), async (req, res) => {
 
     await storage.putObject(params, (_, __) => null).promise();
 
-    res.json({ result: "success", url: `https://haze-dev-8901.s3.ap-northeast-2.amazonaws.com/resized/${key}` });
+    res.json({ result: "success", url: `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/resized/${key}` });
   } catch (error) {
     res.status(500).json({ result: "error", error: error })
   }
