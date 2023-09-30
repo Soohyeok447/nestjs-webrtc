@@ -1,7 +1,7 @@
 {
-  "name": "image-server",
+  "name": "webchat-image-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "The NodeJS based Api server for Web Chat Matching and Image Management",
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
@@ -12,17 +12,32 @@
   "author": "Kimsoohyeok",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.18.2"
+    "@aws-sdk/client-s3": "^3.421.0",
+    "@aws-sdk/lib-storage": "^3.421.0",
+    "aws-sdk": "^2.1464.0",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^7.5.3",
+    "multer": "^1.4.5-lts.1",
+    "multer-s3": "^3.0.1",
+    "sharp": "^0.32.6",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@types/express": "^4.17.18",
-    "@types/node": "^20.7.0",
-    "concurrently": "^8.2.1",
-    "nodemon": "^3.0.1",
-    "typescript": "^5.2.2",
     "@babel/cli": "^7.22.15",
     "@babel/core": "^7.22.15",
     "@babel/node": "^7.22.15",
-    "@babel/preset-env": "^7.22.15"
+    "@babel/preset-env": "^7.22.15",
+    "@types/aws-sdk": "^2.7.0",
+    "@types/express": "^4.17.18",
+    "@types/mongoose": "^5.11.97",
+    "@types/multer": "^1.4.7",
+    "@types/multer-s3": "^3.0.0",
+    "@types/node": "^20.7.0",
+    "@types/uuid": "^9.0.4",
+    "concurrently": "^8.2.1",
+    "nodemon": "^3.0.1",
+    "typescript": "^5.2.2"
   }
 }
