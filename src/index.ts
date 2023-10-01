@@ -20,59 +20,47 @@ const apiEndPoint = `/api/${apiVersion}`;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const resizeAndUploadImage = async (file: Express.Multer.File) => {
+  const resizedBuffer = await sharp(file.buffer)
+    .resize({ height: 800 })
+    .toBuffer();
+
+  const key = v4();
+
+  const params = {
+    Bucket: process.env.S3_BUCKET_NAME,
+    Key: `resized/${key}`,
+    Body: resizedBuffer,
+    ContentType: 'image',
+    ACL: 'public-read',
+  };
+
+  await storage.putObject(params).promise();
+
+  return `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/resized/${key}`;
+};
+
 app.post(`${apiEndPoint}/avatars`, upload.array('avatars'), async (req, res) => {
   try {
-    const resizedImageUrls = [];
-
-    for (const file of (req.files as Express.Multer.File[])) {
-      const resizedBuffer = await sharp(file.buffer)
-        .resize({ height: 800 })
-        .toBuffer();
-
-      const key = v4();
-
-      const params = {
-        Bucket: process.env.S3_BUCKET_NAME,
-        Key: `resized/${key}`,
-        Body: resizedBuffer,
-        ContentType: 'image',
-        ACL: 'public-read',
-      };
-
-      await storage.putObject(params, (_, __) => null).promise();
-
-      resizedImageUrls.push(`https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/resized/${key}`);
-    }
+    const resizedImageUrls = await Promise.all(
+      (req.files as Express.Multer.File[]).map(resizeAndUploadImage)
+    );
 
     res.json({ result: 'success', urls: resizedImageUrls });
   } catch (error) {
-    console.log(error)
-
-    res.status(500).json({ result: 'error', error })
+    console.error(error);
+    res.status(500).json({ result: 'error', error });
   }
 })
 
 app.post(`${apiEndPoint}/avatar`, upload.single('avatar'), async (req, res) => {
   try {
-    const resizedBuffer = await sharp(req.file.buffer)
-      .resize({ height: 800 })
-      .toBuffer();
+    const resizedImageUrl = await resizeAndUploadImage(req.file);
 
-    const key = v4();
-
-    const params = {
-      Bucket: process.env.S3_BUCKET_NAME,
-      Key: `resized/${key}`,
-      Body: resizedBuffer,
-      ContentType: 'image',
-      ACL: 'public-read',
-    };
-
-    await storage.putObject(params, (_, __) => null).promise();
-
-    res.json({ result: "success", url: `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/resized/${key}` });
+    res.json({ result: 'success', url: resizedImageUrl });
   } catch (error) {
-    res.status(500).json({ result: "error", error: error })
+    console.error(error);
+    res.status(500).json({ result: 'error', error });
   }
 })
 
