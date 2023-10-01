@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import imageRouter from './imageRoute';
+import authRouter from './authRoute';
 
-const router = Router();
+const apiRouter = Router();
 
-router.use('/images', imageRouter); // 이미지 라우터
+apiRouter.use('/images', imageRouter);
+apiRouter.use('/auth', authRouter);
 
-export default router;
+export default apiRouter;

@@ -1,7 +1,8 @@
 import express, { Express } from 'express';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
-import router from './routes/apiRoute';
+import cookieParser from 'cookie-parser'
+import apiRouter from './routes/apiRoute';
 
 // import { createServer } from "http";
 
@@ -13,8 +14,9 @@ const port = process.env.PORT;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser())
 
-app.use(`/api/v1`, router);
+app.use(`/api`, apiRouter);
 
 app.listen(port, () => {
   console.log(`http://localhost:${port}`);

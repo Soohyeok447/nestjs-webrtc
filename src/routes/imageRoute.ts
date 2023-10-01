@@ -1,14 +1,15 @@
 import { Router } from 'express';
-import { upload } from '../middlewares/multer';
-import imageController from '../controllers/imageController';
+import upload from '../middlewares/multer';
+import ImageController from '../controllers/imageController';
+// import ImageService from '../services/imageService';
 
 const imageRouter = Router();
 
-// POST /images 이미지 여러장 POST
-imageRouter.post('/', upload.array('images'), imageController.uploadImages);
+// images 이미지 여러장 POST
+imageRouter.post('/', upload.array('images'), ImageController.uploadImages);
 
-// POST /image 이미지 1장 POST
-imageRouter.post('/single', upload.single('image'), imageController.uploadImage);
+// image 이미지 1장 POST
+imageRouter.post('/single', upload.single('image'), ImageController.uploadImage);
 
 //TODO GET 이미지
 

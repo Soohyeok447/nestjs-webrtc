@@ -1,6 +1,6 @@
 import sharp from "sharp";
 import { v4 } from "uuid";
-import { storage } from "../config/storage";
+import storage from "../config/storage";
 
 export const resizeAndUploadImage = async (file: Express.Multer.File) => {
   const resizedBuffer = await sharp(file.buffer)
@@ -21,3 +21,4 @@ export const resizeAndUploadImage = async (file: Express.Multer.File) => {
 
   return `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/resized/${key}`;
 };
+
