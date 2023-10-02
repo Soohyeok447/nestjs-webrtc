@@ -7,10 +7,7 @@ import { verifyToken } from '../middlewares/jwt';
 const imageRouter = Router();
 
 // images 이미지 여러장 POST
-imageRouter.post('/', verifyToken, upload.array('images'), ImageController.uploadImages);
-
-// image 이미지 1장 POST
-imageRouter.post('/single', verifyToken, upload.single('image'), ImageController.uploadImage);
+imageRouter.post('/', verifyToken, upload.array('images'), ImageController.createImages);
 
 //TODO GET 이미지
 

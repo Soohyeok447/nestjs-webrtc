@@ -1,30 +1,27 @@
 import { Request, Response } from 'express';
-import * as imageService from '../services/imageService';
+import ImageService from '../services/imageService';
+import { Images } from '../models/imagesModel';
+import { CreateImagesDTO } from './dtos/imageDTOs/createImagesDTO';
 
 class ImageController {
   //이미지 여러장 업로드
-  public async uploadImages({ files }: Request, res: Response): Promise<void> {
+  public async createImages(req: Request, res: Response): Promise<void> {
     try {
-      const resizedImageUrls = await Promise.all(
-        (files as Express.Multer.File[]).map(imageService.resizeAndUploadImage)
-      );
+      const createImagesDto: CreateImagesDTO = {
+        userId: req.userId,
+        files: req.files
+      }
 
-      res.status(201).json({ urls: resizedImageUrls });
+      const createdImages: Images = await ImageService.createImages(createImagesDto)
+
+      res.status(201).json({
+        id: createdImages.id,
+        userId: createdImages.userId,
+        urls: createdImages.urls
+      });
     } catch (error) {
       console.log(error)
 
-      res.status(500).json({ error: error });
-    }
-  }
-
-  //이미지 1장 업로드
-  public async uploadImage({ file }: Request, res: Response): Promise<void> {
-    try {
-      const resizedImageUrl = await imageService.resizeAndUploadImage(file);
-
-      res.status(201).json({ url: resizedImageUrl });
-    } catch (error) {
-      console.log(error)
       res.status(500).json({ error: error });
     }
   }

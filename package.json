@@ -6,6 +6,7 @@
   "scripts": {
     "build": "npx tsc",
     "start": "nodemon",
+    "dev-c": "concurrently \"rm -rf dist\" \"npx tsc --watch\" \"nodemon\"",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon\""
   },
   "keywords": [],

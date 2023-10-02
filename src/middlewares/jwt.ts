@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { InvalidTokenException } from '../exceptions/auth/InvalidToken';
 import { NotFoundTokenException } from '../exceptions/auth/NotFoundToken';
+import { JwtPayload } from '../types/jwtPayload';
 
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
@@ -9,17 +10,14 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 
   const accessToken = req.headers['authorization']?.split(' ')[1];
 
-  console.log("1차")
-
-
   if (!accessToken) {
     return res.status(401).json(NotFoundTokenException);
   }
 
   try {
-    const decoded = jwt.verify(accessToken, API_KEY) as any;
+    const decoded: JwtPayload = jwt.verify(accessToken, API_KEY) as any;
 
-    req["user"] = decoded;
+    req.userId = decoded.userId;
 
     next();
   } catch (error) {
