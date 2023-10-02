@@ -19,7 +19,11 @@ class AuthController {
 
       return res.status(201).json({ accessToken, refreshToken });
     } catch (error) {
-      return res.status(500).json({ message: '알 수 없는 에러', error })
+      if (error.code === 2) {
+        return res.json(401).json({ ...error });
+      }
+
+      return res.status(500).json({ ...error })
     }
   }
 
@@ -38,7 +42,15 @@ class AuthController {
 
       return res.status(201).json({ accessToken });
     } catch (error) {
-      return res.status(500).json({ message: '알 수 없는 에러', error })
+      if (error.code === 1) {
+        return res.json(404).json({ ...error });
+      }
+
+      if (error.code === 2) {
+        return res.json(401).json({ ...error });
+      }
+
+      return res.status(500).json({ message: '알 수 없는 에러', ...error })
     }
   }
 }
