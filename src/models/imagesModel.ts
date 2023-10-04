@@ -1,5 +1,26 @@
 import { Schema, Document, model } from 'mongoose';
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Images:
+ *       type: object
+ *       properties:
+ *         userId:
+ *           type: string
+ *           description: 이미지 소유자의 사용자 ID.
+ *         keys:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: 이미지 키 목록.
+ *         urls:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: 이미지 URL 목록.
+ */
 export interface Images {
   //userId
   readonly userId: string;

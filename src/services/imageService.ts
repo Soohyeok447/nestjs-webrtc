@@ -9,6 +9,9 @@ import { NotFoundImagesException } from "../exceptions/images/NotFoundImages";
 import { MissingFilesException } from "../exceptions/images/MissingFiles";
 import { OnlyOneImageAllowedException } from "../exceptions/images/OnlyOneImageObjectAllowed";
 import { FindImagesDTO } from "../controllers/dtos/imageDTOs/findImagesDTO";
+import { TooManyFilesException } from "../exceptions/images/TooManyFiles";
+
+const FILES_LENGTH = 5; //파일 갯수 제한
 
 class ImageService {
   /**
@@ -24,6 +27,9 @@ class ImageService {
 
       //파일이 제공되지 않았으면 400
       if (!files.length) throw MissingFilesException;
+
+      //파일이 FILES_LENGTH보다 많으면 400
+      if (files.length as number > FILES_LENGTH) throw TooManyFilesException;
 
       const resizedImagesBuffer: Buffer[] = await Promise.all(
         (files as Express.Multer.File[]).map(this._resizeImage)
@@ -54,6 +60,9 @@ class ImageService {
   public async updateImages({ userId, files }: UpdateImagesDTO): Promise<Images> {
     try {
       if (!files.length) throw MissingFilesException;
+
+      //파일이 FILES_LENGTH보다 많으면 400
+      if (files.length as number > FILES_LENGTH) throw TooManyFilesException;
 
       //userId로 이미지 메타데이터 찾아
       const images: Images = await ImageRepository.findByUserId(userId);
