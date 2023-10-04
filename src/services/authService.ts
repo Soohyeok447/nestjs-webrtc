@@ -23,12 +23,12 @@ class AuthService {
 
       return { accessToken };
     } catch (error) {
-      throw { message: '알 수 없는 에러', error }
+      throw error;
     }
   }
 
   public renewAccessToken({ refreshToken }: RenewTokenDTO): { accessToken: string } {
-    //refreshToken이 없으면 401반환.
+    //refreshToken이 없으면 404반환.
     if (!refreshToken) {
       throw NotFoundTokenException;
     }
@@ -43,7 +43,7 @@ class AuthService {
 
       return { accessToken };
     } catch (error) {
-      throw { message: '알 수 없는 에러', error };
+      throw error;
     }
   }
 
@@ -58,7 +58,7 @@ class AuthService {
 
       return { accessToken, refreshToken };
     } catch (error) {
-      throw error.toString();
+      throw error;
     }
   }
 
@@ -72,7 +72,7 @@ class AuthService {
 
       return { accessToken };
     } catch (error) {
-      throw error.toString();;
+      throw error;
     }
   };
 
