@@ -11,7 +11,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
   const accessToken = req.headers['authorization']?.split(' ')[1];
 
   if (!accessToken) {
-    return res.status(401).json(NotFoundTokenException);
+    return res.status(401).json(new NotFoundTokenException());
   }
 
   try {
@@ -21,6 +21,6 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 
     next();
   } catch (error) {
-    return res.status(401).json(InvalidTokenException);
+    return res.status(401).json(new InvalidTokenException());
   }
 };

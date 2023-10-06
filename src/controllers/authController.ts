@@ -119,8 +119,7 @@ class AuthController {
 
       return res.status(201).json({ accessToken, refreshToken });
     } catch (error) {
-
-      if (error.code === InvalidTokenException.code) {
+      if (error instanceof InvalidTokenException) {
         return res.status(401).json(error);
       }
 
@@ -210,12 +209,12 @@ class AuthController {
 
       return res.status(201).json({ accessToken });
     } catch (error) {
-      if (error.code === NotFoundTokenException.code) {
-        return res.status(400).json({ ...error });
+      if (error instanceof NotFoundTokenException) {
+        return res.status(400).json(error);
       }
 
-      if (error.code === InvalidTokenException.code) {
-        return res.status(401).json({ ...error });
+      if (error instanceof InvalidTokenException) {
+        return res.status(401).json(error);
       }
 
       return res.status(500).json({ message: '서버 내부 에러', error })
