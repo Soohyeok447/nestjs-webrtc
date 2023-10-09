@@ -23,10 +23,10 @@ class ImageService {
       //userId로 찾고 있으면 409
       const images = await ImageRepository.findByUserId(userId);
 
-      if (images) throw OnlyOneImageAllowedException;
+      if (images) throw new OnlyOneImageAllowedException();
 
       //파일이 제공되지 않았으면 400
-      if (!files.length) throw MissingFilesException;
+      if (!files.length) throw new MissingFilesException();
 
       //파일이 FILES_LENGTH보다 많으면 400
       if (files.length as number > FILES_LENGTH) throw TooManyFilesException;
@@ -50,7 +50,7 @@ class ImageService {
 
       return createdImage
     } catch (error) {
-      throw { message: '이미지 생성에 실패했습니다.', ...error }
+      throw error
     }
   }
 
@@ -59,16 +59,16 @@ class ImageService {
    */
   public async updateImages({ userId, files }: UpdateImagesDTO): Promise<Images> {
     try {
-      if (!files.length) throw MissingFilesException;
+      if (!files.length) throw new MissingFilesException();
 
       //파일이 FILES_LENGTH보다 많으면 400
-      if (files.length as number > FILES_LENGTH) throw TooManyFilesException;
+      if (files.length as number > FILES_LENGTH) throw new TooManyFilesException();
 
       //userId로 이미지 메타데이터 찾아
       const images: Images = await ImageRepository.findByUserId(userId);
 
       //없으면 404
-      if (!images) throw NotFoundImagesException;
+      if (!images) throw new NotFoundImagesException();
 
       const { keys } = images;
 
@@ -96,7 +96,7 @@ class ImageService {
 
       return updatedImages;
     } catch (error) {
-      throw { message: '이미지를 업데이트 하지 못했습니다.', ...error }
+      throw error;
     }
   }
 
@@ -109,11 +109,11 @@ class ImageService {
       const images: Images = await ImageRepository.findByUserId(userId);
 
       //없으면 404
-      if (!images) throw NotFoundImagesException;
+      if (!images) throw new NotFoundImagesException();
 
       return images;
     } catch (error) {
-      throw { message: '이미지를 찾지 못했습니다.', ...error }
+      throw error;
     }
   }
 

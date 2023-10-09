@@ -18,7 +18,7 @@ class AuthService {
 
       //accessToken이 만료됐으면 401반환. 클라이언트는 401을 수신할 경우 renew를 시도해야합니다.
       if (!this.verifyToken(accessToken)) {
-        throw InvalidTokenException;
+        throw new InvalidTokenException();
       }
 
       return { accessToken };
@@ -30,7 +30,7 @@ class AuthService {
   public renewAccessToken({ refreshToken }: RenewTokenDTO): { accessToken: string } {
     //refreshToken이 없으면 404반환.
     if (!refreshToken) {
-      throw NotFoundTokenException;
+      throw new NotFoundTokenException();
     }
 
     try {

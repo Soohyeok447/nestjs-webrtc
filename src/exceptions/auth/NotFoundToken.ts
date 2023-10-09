@@ -1,3 +1,5 @@
+import { Exception } from "../exception";
+
 /**
  * @swagger
  * components:
@@ -6,4 +8,8 @@
  *       code: 1001
  *       message: '토큰이 없습니다.'
  */
-export const NotFoundTokenException = { code: 1001, message: '토큰이 없습니다.' };
+export class NotFoundTokenException extends Exception {
+  constructor() {
+    super({ code: 1001, message: '토큰이 없습니다.' });
+  }
+}

@@ -1,8 +1,17 @@
 import { Router } from 'express';
 import imageRouter from './imageRoute';
 import authRouter from './authRoute';
+import healthRouter from './healthRoute';
 
 const apiRouter = Router();
+
+/**
+ * @swagger
+ * tags:
+ *   name: Health
+ *   description: health check
+ */
+apiRouter.use('/health', healthRouter);
 
 /**
  * @swagger

@@ -145,15 +145,15 @@ class ImageController {
         updatedAt: createdImages.updatedAt
       });
     } catch (error) {
-      if (error.code === MissingFilesException.code) {
+      if (error instanceof MissingFilesException) {
         return res.status(400).json(error);
       }
 
-      if (error.code === OnlyOneImageAllowedException.code) {
+      if (error instanceof OnlyOneImageAllowedException) {
         return res.status(409).json(error);
       }
 
-      if (error.code === TooManyFilesException.code) {
+      if (error instanceof TooManyFilesException) {
         return res.status(400).json(error);
       }
 
@@ -283,15 +283,15 @@ class ImageController {
         updatedAt: updatedImages.updatedAt
       });
     } catch (error) {
-      if (error.code === NotFoundImagesException.code) {
+      if (error instanceof NotFoundImagesException) {
         return res.status(404).json(error);
       }
 
-      if (error.code === MissingFilesException.code) {
+      if (error instanceof MissingFilesException) {
         return res.status(400).json(error);
       }
 
-      if (error.code === TooManyFilesException.code) {
+      if (error instanceof TooManyFilesException) {
         return res.status(400).json(error);
       }
 
@@ -394,11 +394,11 @@ class ImageController {
         updatedAt: images.updatedAt
       });
     } catch (error) {
-      if (error.code === 1) {
-        return res.status(404).json({ ...error });
+      if (error instanceof NotFoundImagesException) {
+        return res.status(404).json(error);
       }
 
-      return res.status(500).json({ ...error });
+      return res.status(500).json({ message: '서버 내부 에러', error });
     }
   }
 
@@ -506,11 +506,11 @@ class ImageController {
         updatedAt: images.updatedAt
       });
     } catch (error) {
-      if (error.code === 1) {
-        return res.status(404).json({ ...error });
+      if (error instanceof NotFoundImagesException) {
+        return res.status(404).json(error);
       }
 
-      return res.status(500).json({ ...error });
+      return res.status(500).json({ message: '서버 내부 에러', error });
     }
   }
 
