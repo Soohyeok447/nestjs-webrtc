@@ -1,17 +1,19 @@
 import express, { Express } from 'express';
+// import { createServer } from "http";
 import { setMongoose } from './config/db';
 import apiRouter from './routes/apiRoute';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import helmet from 'helmet';
-import { options, serve, setup, swaggerSpec } from './config/swagger'
+import { serve, setup, swaggerSpec } from './config/swagger'
 import { throttle } from './config/throttle';
-import { Swagger } from 'express-swagger-generator';
 
+const environment = process.env.NODE_ENV || 'development';
 
-dotenv.config();
+dotenv.config({
+  path: `.env.${environment}`,
+});
 
-// import { createServer } from "http";
 
 const app: Express = express();
 const port = process.env.PORT;
