@@ -26,7 +26,8 @@ app.use(helmet());
 app.disable('x-powered-by');
 environment === 'development'
   ? app.use(cors({
-    origin: `http://localhost:${[port]}`,
+    origin: `http://localhost:${port}`,
+    optionsSuccessStatus: 200,
   }))
   : ({});
 app.use('/docs', serve, setup(swaggerSpec));

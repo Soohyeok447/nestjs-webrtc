@@ -25,7 +25,7 @@ export const options = {
         description: 'local'
       },
       {
-        url: 'http://TBD:3001',
+        url: 'http://13.125.38.177:3001',
         description: 'dev'
       },
       {
