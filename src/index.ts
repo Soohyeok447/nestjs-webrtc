@@ -5,6 +5,7 @@ import apiRouter from './routes/apiRoute';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import helmet from 'helmet';
+import cors from 'cors';
 import { serve, setup, swaggerSpec } from './config/swagger'
 import { throttle } from './config/throttle';
 
@@ -23,6 +24,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
 app.disable('x-powered-by');
+environment === 'development'
+  ? app.use(cors({
+    origin: `http://localhost:${[port]}`,
+  }))
+  : ({});
 app.use('/docs', serve, setup(swaggerSpec));
 
 // Swagger(app)(options);
