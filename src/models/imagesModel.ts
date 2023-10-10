@@ -22,13 +22,10 @@ import { Schema, Document, model } from 'mongoose';
  *           description: 이미지 URL 목록.
  */
 export interface Images {
-  //userId
   readonly userId: string;
 
-  //image keys
   readonly keys: string[];
 
-  //image urls
   readonly urls: string[];
 
   readonly createdAt?: Date;
