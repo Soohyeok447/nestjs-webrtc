@@ -5,13 +5,23 @@ import { InvalidTokenException } from '../exceptions/auth/InvalidToken';
 import { NotFoundTokenException } from '../exceptions/auth/NotFoundToken';
 import { FetchOrGenerateTokenDTO } from '../controllers/dtos/authDTOs/fetchOrGenerateTokenDTO';
 import { RenewTokenDTO } from '../controllers/dtos/authDTOs/renewTokenDTO';
+import UserRepository from '../repositories/userRepository';
+import { User } from '../models/userModel';
 
 class AuthService {
-  public fetchOrGenerateToken({ accessToken }: FetchOrGenerateTokenDTO): Token {
+  public async signIn({ accessToken }: FetchOrGenerateTokenDTO): Promise<Token> {
     try {
       //accessToken이 없으면 token을 generate후 response
       if (!accessToken) {
-        const { accessToken, refreshToken }: Token = this.generateTokens();
+        const { accessToken, refreshToken, id } = this.generateTokens();
+
+        await UserRepository.create({
+          id,
+          socketId: 'tbd',
+          refreshToken,
+          tags: [],
+          bans: [],
+        })
 
         return { accessToken, refreshToken };
       }
@@ -47,7 +57,7 @@ class AuthService {
     }
   }
 
-  public generateTokens(): Token {
+  public generateTokens(): Token & { id: string } {
     const userId: string = UUIDService.generateUUID();
     const ISS = process.env.HAZE_API_ISSUER;
     const API_KEY = process.env.HAZE_API_KEY;
@@ -56,7 +66,7 @@ class AuthService {
       const accessToken = jwt.sign({ userId, iss: ISS }, API_KEY, { expiresIn: '30m' });
       const refreshToken = jwt.sign({ userId, iss: ISS }, API_KEY, { expiresIn: '30d' });
 
-      return { accessToken, refreshToken };
+      return { accessToken, refreshToken, id: userId };
     } catch (error) {
       throw error;
     }

@@ -107,7 +107,7 @@ class AuthController {
  *                   type: object
  *                   example: {}
  */
-  public fetchOrGenerateToken({ headers }: Request, res: Response) {
+  public async signIn({ headers }: Request, res: Response) {
     const accessToken = headers['authorization']?.split(' ')[1];
 
     const fetchOrGenerateToken: FetchOrGenerateTokenDTO = {
@@ -115,7 +115,7 @@ class AuthController {
     }
 
     try {
-      const { accessToken, refreshToken } = AuthService.fetchOrGenerateToken(fetchOrGenerateToken)
+      const { accessToken, refreshToken } = await AuthService.signIn(fetchOrGenerateToken)
 
       return res.status(201).json({ accessToken, refreshToken });
     } catch (error) {

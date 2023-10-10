@@ -18,27 +18,22 @@ dotenv.config({
 
 const app: Express = express();
 const port = process.env.PORT;
+const serverUrl = process.env.SERVER_URL;
 // const httpServer = createServer(app);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(helmet());
+//app.use(helmet()); tls적용 후 적용
+//app.use(cors()); tls적용 후 적용
 app.disable('x-powered-by');
-environment === 'development'
-  ? app.use(cors({
-    origin: `http://localhost:${port}`,
-    optionsSuccessStatus: 200,
-  }))
-  : ({});
+
 app.use('/docs', serve, setup(swaggerSpec));
 
-// Swagger(app)(options);
 
 app.use('/api', throttle);
 app.use(`/api`, apiRouter);
 
 app.listen(port, () => {
-  console.log(`http://localhost:${port}`);
   setMongoose();
 });
 
