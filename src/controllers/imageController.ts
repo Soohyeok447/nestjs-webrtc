@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import ImageService from '../services/imageService';
 import { Images } from '../models/imagesModel';
-import { CreateImagesDTO } from './dtos/imageDTOs/createImagesDTO';
-import { UpdateImagesDTO } from './dtos/imageDTOs/updateImagesDTO';
-import { FindImagesDTO } from './dtos/imageDTOs/findImagesDTO';
+import { CreateImagesDTO } from './dtos/imagesDTOs/createImagesDTO';
+import { UpdateImagesDTO } from './dtos/imagesDTOs/updateImagesDTO';
+import { FindImagesDTO } from './dtos/imagesDTOs/findImagesDTO';
 import { TooManyFilesException } from '../exceptions/images/TooManyFiles';
 import { OnlyOneImageAllowedException } from '../exceptions/images/OnlyOneImageObjectAllowed';
 import { MissingFilesException } from '../exceptions/images/MissingFiles';
@@ -30,7 +30,8 @@ class ImageController {
  * 
  *        `[Exceptions]`<br>
  *        code: 1000 (401) - 유효하지 않은 토큰일 경우<br>
- *        code: 1001 (400) - 토큰이 제공되지 않은 경우<br>
+ *        code: 1001 (401) - 토큰이 제공되지 않은 경우<br>
+ *        code: 1002 (401) - 토큰이 만료된 경우<br>
  *        code: 2 (400) - 파일이 multipart/form-data 형식으로 제공되지 않은 경우 | 파일이 없는 경우<br>
  *        code: 3 (409) - 이미 유저가 이미지를 한 번 저장한 경우<br>
  *        code: 4 (400) - 파일 갯수 제한보다 많은 파일을 생성 요청한 경우'
@@ -51,30 +52,10 @@ class ImageController {
  *     responses:
  *       201:
  *         description: 이미지 업로드 성공. 이 urls 프로퍼티들을 사용하면됩니다.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 userId:
- *                   type: string
- *                   example: f2804e89-455e-4fb1-b7cb-a5aa1865ea5f
- *                 keys:
- *                   type: array
- *                   items:
- *                     type: string
- *                     example: [f2804e89-455e-4fb1-b7cb-a5aa1865ea5f, f2804e89-455e-4fb1-b7cb-a5aa1865ea5f]
- *                 urls:
- *                   type: array
- *                   items:
- *                     type: string
- *                     example: [https://haze-dev-8901.s3.ap-northeast-2.amazonaws.com/resized/11646720-85fd-4d45-bbdf-58d5f925cab5, https://haze-dev-8901.s3.ap-northeast-2.amazonaws.com/resized/11646720-85fd-4d45-bbdf-58d5f925cab5]
- *                 createdAt:
- *                   type: Date
- *                   example: 2023-10-04T18:50:48.894Z
- *                 updatedAt:
- *                   type: Date
- *                   example: 2023-10-04T18:50:48.894Z
+    *         content:
+    *           application/json:
+    *             schema:
+    *               $ref: '#/components/schemas/Images'
  *       400:
  *         description: 제공된 파일이 없는 경우 | 제한된 갯수보다 많은 파일로 요청한 경우
  *         content:
@@ -106,14 +87,7 @@ class ImageController {
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 code:
- *                   type: number
- *                   example: 3
- *                 message:
- *                   type: string
- *                   example: 이미 생성한 이미지가 존재합니다.
+ *               $ref: '#/components/schemas/OnlyOneImageAllowedException'
  *       500:
  *         description: 내부 서버 오류가 발생한 경우.
  *         content:
@@ -181,7 +155,8 @@ class ImageController {
     * 
     *        `[Exceptions]`<br>
     *        code: 1000 (401) - 유효하지 않은 토큰일 경우<br>
-    *        code: 1001 (400) - 토큰이 제공되지 않은 경우<br>
+    *        code: 1001 (401) - 토큰이 제공되지 않은 경우<br>
+    *        code: 1002 (401) - 토큰이 만료된 경우<br>
     *        code: 1 (404) - 파일 메타데이터를 DB에서 찾지 못한 경우 <br>
     *        code: 2 (400) - 파일이 multipart/form-data 형식으로 제공되지 않은 경우 | 파일이 없는 경우<br>
     *        code: 4 (400) - 파일 갯수 제한보다 많은 파일을 생성 요청한 경우'
@@ -205,53 +180,19 @@ class ImageController {
     *         content:
     *           application/json:
     *             schema:
-    *               type: object
-    *               properties:
-    *                 userId:
-    *                   type: string
-    *                   example: f2804e89-455e-4fb1-b7cb-a5aa1865ea5f
-    *                 keys:
-    *                   type: array
-    *                   items:
-    *                     type: string
-    *                     example: [f2804e89-455e-4fb1-b7cb-a5aa1865ea5f, f2804e89-455e-4fb1-b7cb-a5aa1865ea5f]
-    *                 urls:
-    *                   type: array
-    *                   items:
-    *                     type: string
-    *                     example: [https://haze-dev-8901.s3.ap-northeast-2.amazonaws.com/resized/11646720-85fd-4d45-bbdf-58d5f925cab5, https://haze-dev-8901.s3.ap-northeast-2.amazonaws.com/resized/11646720-85fd-4d45-bbdf-58d5f925cab5]
-    *                 createdAt:
-    *                   type: Date
-    *                   example: 2023-10-04T18:50:48.894Z
-    *                 updatedAt:
-    *                   type: Date
-    *                   example: 2023-10-04T18:50:48.894Z
+    *               $ref: '#/components/schemas/Images'
     *       400:
     *         description: 제공된 파일이 없는 경우 | 제한된 갯수보다 많은 파일로 요청한 경우
     *         content:
     *           application/json:
     *             schema:
-    *               type: object
-    *               properties:
-    *                 code:
-    *                   type: number
-    *                   example: 2
-    *                 message:
-    *                   type: string
-    *                   example: 파일이 제공되지 않았습니다.
+    *               $ref: '#/components/schemas/TooManyFilesException'
     *       404:
     *         description: DB에서 메타데이터를 찾는 것을 실패한 경우
     *         content:
     *           application/json:
     *             schema:
-    *               type: object
-    *               properties:
-    *                 code:
-    *                   type: number
-    *                   example: 1
-    *                 message:
-    *                   type: string
-    *                   example: 이미지를 찾을 수 없습니다.
+    *               $ref: '#/components/schemas/NotFoundImagesException'
     *       500:
     *         description: 내부 서버 오류가 발생한 경우.
     *         content:
@@ -312,9 +253,10 @@ class ImageController {
     *       Authorization AccessToken (Required)<br><br>
     * 
     *       `[Exceptions]`<br>
-    *       code: 1000 (401) - 유효하지 않은 토큰일 경우<br>
-    *       code: 1001 (400) - 토큰이 제공되지 않은 경우<br>
-    *       code: 1 (404) - 파일 메타데이터를 DB에서 찾지 못한 경우 <br>'
+    *        code: 1000 (401) - 유효하지 않은 토큰일 경우<br>
+    *        code: 1001 (401) - 토큰이 제공되지 않은 경우<br>
+    *        code: 1002 (401) - 토큰이 만료된 경우<br>
+    *        code: 1 (404) - 파일 메타데이터를 DB에서 찾지 못한 경우 <br>'
     *     tags: [ Images ]
     *     parameters:
     *       - in: header
@@ -330,40 +272,13 @@ class ImageController {
     *         content:
     *           application/json:
     *             schema:
-    *               type: object
-    *               properties:
-    *                 userId:
-    *                   type: string
-    *                   example: f2804e89-455e-4fb1-b7cb-a5aa1865ea5f
-    *                 keys:
-    *                   type: array
-    *                   items:
-    *                     type: string
-    *                     example: [f2804e89-455e-4fb1-b7cb-a5aa1865ea5f, f2804e89-455e-4fb1-b7cb-a5aa1865ea5f]
-    *                 urls:
-    *                   type: array
-    *                   items:
-    *                     type: string
-    *                     example: [https://haze-dev-8901.s3.ap-northeast-2.amazonaws.com/resized/11646720-85fd-4d45-bbdf-58d5f925cab5, https://haze-dev-8901.s3.ap-northeast-2.amazonaws.com/resized/11646720-85fd-4d45-bbdf-58d5f925cab5]
-    *                 createdAt:
-    *                   type: Date
-    *                   example: 2023-10-04T18:50:48.894Z
-    *                 updatedAt:
-    *                   type: Date
-    *                   example: 2023-10-04T18:50:48.894Z
+    *               $ref: '#/components/schemas/Images'
     *       404:
     *         description: DB에서 메타데이터를 찾는 것을 실패한 경우
     *         content:
     *           application/json:
     *             schema:
-    *               type: object
-    *               properties:
-    *                 code:
-    *                   type: number
-    *                   example: 1
-    *                 message:
-    *                   type: string
-    *                   example: 이미지를 찾을 수 없습니다.
+    *               $ref: '#/components/schemas/NotFoundImagesException'
     *       500:
     *         description: 내부 서버 오류가 발생한 경우.
     *         content:
@@ -418,9 +333,10 @@ class ImageController {
     *       userId: String (Required)<br><br>
     * 
     *       `[Exceptions]`<br>
-    *       code: 1000 (401) - 유효하지 않은 토큰일 경우<br>
-    *       code: 1001 (400) - 토큰이 제공되지 않은 경우<br>
-    *       code: 1 (404) - 파일 메타데이터를 DB에서 찾지 못한 경우 <br>'    
+    *        code: 1000 (401) - 유효하지 않은 토큰일 경우<br>
+    *        code: 1001 (401) - 토큰이 제공되지 않은 경우<br>
+    *        code: 1002 (401) - 토큰이 만료된 경우 <br>
+    *        code: 1 (404) - 파일 메타데이터를 DB에서 찾지 못한 경우 <br>'    
     *     tags: [ Images ]
     *     parameters:
     *       - in: path
@@ -442,40 +358,13 @@ class ImageController {
     *         content:
     *           application/json:
     *             schema:
-    *               type: object
-    *               properties:
-    *                 userId:
-    *                   type: string
-    *                   example: f2804e89-455e-4fb1-b7cb-a5aa1865ea5f
-    *                 keys:
-    *                   type: array
-    *                   items:
-    *                     type: string
-    *                     example: [f2804e89-455e-4fb1-b7cb-a5aa1865ea5f, f2804e89-455e-4fb1-b7cb-a5aa1865ea5f]
-    *                 urls:
-    *                   type: array
-    *                   items:
-    *                     type: string
-    *                     example: [https://haze-dev-8901.s3.ap-northeast-2.amazonaws.com/resized/11646720-85fd-4d45-bbdf-58d5f925cab5, https://haze-dev-8901.s3.ap-northeast-2.amazonaws.com/resized/11646720-85fd-4d45-bbdf-58d5f925cab5]
-    *                 createdAt:
-    *                   type: Date
-    *                   example: 2023-10-04T18:50:48.894Z
-    *                 updatedAt:
-    *                   type: Date
-    *                   example: 2023-10-04T18:50:48.894Z
+    *               $ref: '#/components/schemas/Images'
     *       404:
     *         description: DB에서 메타데이터를 찾는 것을 실패한 경우
     *         content:
     *           application/json:
     *             schema:
-    *               type: object
-    *               properties:
-    *                 code:
-    *                   type: number
-    *                   example: 1
-    *                 message:
-    *                   type: string
-    *                   example: 이미지를 찾을 수 없습니다.
+    *               $ref: '#/components/schemas/NotFoundImagesException'
     *       500:
     *         description: 내부 서버 오류가 발생한 경우.
     *         content:

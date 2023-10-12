@@ -1,14 +1,14 @@
 import sharp from "sharp";
 import storage from "../config/storage";
-import { CreateImagesDTO } from "../controllers/dtos/imageDTOs/createImagesDTO";
+import { CreateImagesDTO } from "../controllers/dtos/imagesDTOs/createImagesDTO";
 import { Images } from "../models/imagesModel";
 import ImageRepository from "../repositories/imageRepository";
 import UUIDService from "./uuidService";
-import { UpdateImagesDTO } from "../controllers/dtos/imageDTOs/updateImagesDTO";
+import { UpdateImagesDTO } from "../controllers/dtos/imagesDTOs/updateImagesDTO";
 import { NotFoundImagesException } from "../exceptions/images/NotFoundImages";
 import { MissingFilesException } from "../exceptions/images/MissingFiles";
 import { OnlyOneImageAllowedException } from "../exceptions/images/OnlyOneImageObjectAllowed";
-import { FindImagesDTO } from "../controllers/dtos/imageDTOs/findImagesDTO";
+import { FindImagesDTO } from "../controllers/dtos/imagesDTOs/findImagesDTO";
 import { TooManyFilesException } from "../exceptions/images/TooManyFiles";
 
 const FILES_LENGTH = 5; //파일 갯수 제한

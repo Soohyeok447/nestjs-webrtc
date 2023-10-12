@@ -2,6 +2,7 @@ import { Router } from 'express';
 import imageRouter from './imageRoute';
 import authRouter from './authRoute';
 import healthRouter from './healthRoute';
+import userRouter from './userRoute';
 
 const apiRouter = Router();
 
@@ -20,6 +21,14 @@ apiRouter.use('/health', healthRouter);
  *   description: 이미지 추가, 수정, 조회
  */
 apiRouter.use('/images', imageRouter);
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: 유저 수정, 조회
+ */
+apiRouter.use('/users', userRouter);
 
 /**
  * @swagger

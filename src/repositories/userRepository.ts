@@ -1,24 +1,69 @@
 import { User, UserModel } from "../models/userModel";
 
 class UserRepository {
-  public async create({ id, socketId, refreshToken, tags, bans }: User): Promise<User> {
-    const user = new UserModel({ id, socketId, refreshToken, tags, bans });
+  public async create({ id, socketId, refreshToken, gender, nickname, birth, location, interests, purpose, bans, reported }): Promise<User> {
+    try {
+      const user = new UserModel({
+        id,
+        socketId,
+        refreshToken,
+        gender,
+        nickname,
+        birth,
+        location,
+        interests,
+        purpose,
+        bans,
+        reported,
+      });
 
-    return await user.save();
+      return await user.save();
+    } catch (error) {
+      throw error;
+    }
   }
 
   public async findById(id: string): Promise<User | null> {
-    return await UserModel.findOne({ id }).exec();
+    try {
+      return await UserModel.findOne({ id }).exec();
+    } catch (error) {
+      throw error;
+    }
   }
 
-  public async update({ id, refreshToken, tags, bans }): Promise<User> {
-    const user = await UserModel.findOne({ id }).exec();
+  public async update({
+    id,
+    socketId,
+    refreshToken,
+    nickname,
+    birth,
+    location,
+    interests,
+    purpose,
+    bans,
+    reported,
+  }: Partial<User>): Promise<User | null> {
+    try {
+      const updatedUser = await UserModel.findOneAndUpdate(
+        { id },
+        {
+          socketId,
+          refreshToken,
+          nickname,
+          birth,
+          location,
+          interests,
+          purpose,
+          bans,
+          reported,
+        },
+        { new: true }
+      ).exec();
 
-    user.refreshToken = refreshToken !== undefined ? refreshToken : user.refreshToken;
-    user.tags = tags !== undefined ? tags : user.tags;
-    user.bans = bans !== undefined ? bans : user.bans;
-
-    return await user.save();
+      return updatedUser || null;
+    } catch (error) {
+      throw error;
+    }
   }
 }
 

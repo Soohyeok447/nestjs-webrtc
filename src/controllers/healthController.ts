@@ -3,7 +3,7 @@ import AuthService from './../services/authService'
 import { FetchOrGenerateTokenDTO } from './dtos/authDTOs/fetchOrGenerateTokenDTO';
 import { RenewTokenDTO } from './dtos/authDTOs/renewTokenDTO';
 import { InvalidTokenException } from '../exceptions/auth/InvalidToken';
-import { NotFoundTokenException } from '../exceptions/auth/NotFoundToken';
+import { MissingTokenException } from '../exceptions/auth/MissingTokenException';
 
 class HealthController {
   /**

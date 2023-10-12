@@ -18,7 +18,7 @@ dotenv.config({
 
 const app: Express = express();
 const port = process.env.PORT;
-const serverUrl = process.env.SERVER_URL;
+
 // const httpServer = createServer(app);
 
 app.use(bodyParser.json());

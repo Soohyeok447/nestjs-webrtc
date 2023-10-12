@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import { JsonWebTokenError, TokenExpiredError, verify } from 'jsonwebtoken';
 import { InvalidTokenException } from '../exceptions/auth/InvalidToken';
-import { NotFoundTokenException } from '../exceptions/auth/NotFoundToken';
+import { MissingTokenException } from '../exceptions/auth/MissingTokenException';
 import { JwtPayload } from '../types/jwtPayload';
+import { TokenExpiredException } from '../exceptions/auth/TokenExpiredException';
+import { decode } from 'punycode';
 
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
@@ -11,16 +13,24 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
   const accessToken = req.headers['authorization']?.split(' ')[1];
 
   if (!accessToken) {
-    return res.status(401).json(new NotFoundTokenException());
+    return res.status(401).json(new MissingTokenException());
   }
 
   try {
-    const decoded: JwtPayload = jwt.verify(accessToken, API_KEY) as any;
+    const decoded: JwtPayload = verify(accessToken, API_KEY) as any;
 
     req.userId = decoded.userId;
 
     next();
   } catch (error) {
-    return res.status(401).json(new InvalidTokenException());
+    if (error instanceof JsonWebTokenError) {
+      return res.status(401).json(new InvalidTokenException());
+    }
+
+    if (error instanceof TokenExpiredError) {
+      return res.status(401).json(new TokenExpiredException());
+    }
+
+    return res.status(401).json(new Error(`${error.toString()} 에러 발생`));
   }
 };

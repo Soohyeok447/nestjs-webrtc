@@ -4,24 +4,24 @@ import { Exception } from "../exception";
  * @swagger
  * components:
  *   schemas:
- *     MissingFilesException:
+ *     TokenExpiredException:
  *       type: object
  *       properties:
  *         name:
  *           type: string
- *           example: MissingFilesException
+ *           example: TokenExpiredException
  *           description: exception명
  *         code:
  *           type: integer
- *           example: 2
+ *           example: 1002
  *           description: 예외 코드.
  *         message:
  *           type: string
- *           example: '파일이 제공되지 않았습니다.'
+ *           example: '토큰이 만료되습니다.'
  *           description: 예외 메시지.
  */
-export class MissingFilesException extends Exception {
+export class TokenExpiredException extends Exception {
   constructor() {
-    super({ code: 2, message: '파일이 제공되지 않았습니다.', name: 'MissingFilesException' });
+    super({ message: '토큰이 만료되었습니다.', code: 1002, name: 'TokenExpiredException' });
   }
 }

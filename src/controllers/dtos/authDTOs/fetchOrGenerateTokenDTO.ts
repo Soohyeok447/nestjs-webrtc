@@ -5,10 +5,10 @@
  *     FetchOrGenerateTokenDTO:
  *       type: object
  *       properties:
- *         accessToken:
+ *         userId:
  *           type: string
- *           description: 액세스 토큰.
+ *           description: accessToken 페이로드 속 userId.
  */
 export interface FetchOrGenerateTokenDTO {
-  readonly accessToken: string;
+  readonly userId: string;
 }
