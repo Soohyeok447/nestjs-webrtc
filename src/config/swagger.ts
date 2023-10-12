@@ -11,7 +11,13 @@ export const options = {
       title: 'Haze API',
       version: '1.0.0',
       description: `
-      현재 이 API는 사용자가 이미지를 관리하는 데에 사용됩니다.
+      
+      [implemented features]
+      - health
+      - user onboarding
+      - authentication with JWT
+      - User CRU
+      - Images CRU
       
       [Upcoming features]
       - 유저매칭 및 태그 기반 알고리즘
