@@ -1,4 +1,4 @@
-import { Exception } from "../exception";
+import { Exception } from '../exception';
 
 /**
  * @swagger
@@ -22,6 +22,10 @@ import { Exception } from "../exception";
  */
 export class NotFoundImagesException extends Exception {
   constructor() {
-    super({ code: 1, message: '이미지를 찾을 수 없습니다.', name: 'NotFoundImagesException' });
+    super({
+      code: 1,
+      message: '이미지를 찾을 수 없습니다.',
+      name: 'NotFoundImagesException',
+    });
   }
 }

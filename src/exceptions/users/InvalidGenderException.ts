@@ -1,4 +1,4 @@
-import { Exception } from "../exception";
+import { Exception } from '../exception';
 
 /**
  * @swagger
@@ -23,6 +23,10 @@ import { Exception } from "../exception";
 
 export class InvalidGenderException extends Exception {
   constructor() {
-    super({ code: 2, message: 'gender는 MALE 또는 FEMALE이어야 합니다.', name: 'InvalidGenderException' });
+    super({
+      code: 2,
+      message: 'gender는 MALE 또는 FEMALE이어야 합니다.',
+      name: 'InvalidGenderException',
+    });
   }
 }

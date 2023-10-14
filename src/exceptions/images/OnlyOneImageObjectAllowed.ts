@@ -1,4 +1,4 @@
-import { Exception } from "../exception";
+import { Exception } from '../exception';
 
 /**
  * @swagger
@@ -22,6 +22,10 @@ import { Exception } from "../exception";
  */
 export class OnlyOneImageAllowedException extends Exception {
   constructor() {
-    super({ code: 3, message: '이미 생성한 이미지가 존재합니다.', name: 'OnlyOneImageAllowedException' });
+    super({
+      code: 3,
+      message: '이미 생성한 이미지가 존재합니다.',
+      name: 'OnlyOneImageAllowedException',
+    });
   }
 }

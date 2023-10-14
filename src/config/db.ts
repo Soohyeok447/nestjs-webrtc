@@ -1,4 +1,4 @@
-import mongoose, { ConnectOptions } from "mongoose";
+import mongoose, { ConnectOptions } from 'mongoose';
 
 export function setMongoose() {
   mongoose
@@ -8,10 +8,10 @@ export function setMongoose() {
       autoIndex: true,
       dbName: process.env.DB_NAME,
     } as ConnectOptions)
-    .then((db) => {
-      console.log("DB 연결됨");
+    .then(() => {
+      console.log('DB 연결됨');
     })
     .catch((err) => {
-      console.log("DB 연결 실패", err);
+      console.log('DB 연결 실패', err);
     });
 }

@@ -4,9 +4,7 @@ import { setMongoose } from './config/db';
 import apiRouter from './routes/apiRoute';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
-import helmet from 'helmet';
-import cors from 'cors';
-import { serve, setup, swaggerSpec } from './config/swagger'
+import { serve, setup, swaggerSpec } from './config/swagger';
 import { throttle } from './config/throttle';
 
 const environment = process.env.NODE_ENV || 'development';
@@ -14,7 +12,6 @@ const environment = process.env.NODE_ENV || 'development';
 dotenv.config({
   path: `.env.${environment}`,
 });
-
 
 const app: Express = express();
 const port = process.env.PORT;
@@ -29,11 +26,9 @@ app.disable('x-powered-by');
 
 app.use('/docs', serve, setup(swaggerSpec));
 
-
 app.use('/api', throttle);
 app.use(`/api`, apiRouter);
 
 app.listen(port, () => {
   setMongoose();
 });
-

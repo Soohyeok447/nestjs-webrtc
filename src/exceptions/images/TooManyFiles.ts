@@ -1,4 +1,4 @@
-import { Exception } from "../exception";
+import { Exception } from '../exception';
 
 /**
  * @swagger
@@ -22,6 +22,10 @@ import { Exception } from "../exception";
  */
 export class TooManyFilesException extends Exception {
   constructor() {
-    super({ code: 4, message: '제공된 파일이 제한보다 많습니다.', name: 'TooManyFilesException' });
+    super({
+      code: 4,
+      message: '제공된 파일이 제한보다 많습니다.',
+      name: 'TooManyFilesException',
+    });
   }
 }

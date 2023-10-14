@@ -11,7 +11,6 @@ authRouter.post('/onboard', AuthController.onBoard);
 authRouter.post('/signin', verifyToken, AuthController.signIn);
 
 // token 갱신
-authRouter.post('/renew', verifyToken, AuthController.renew)
-
+authRouter.post('/renew', verifyToken, AuthController.renew);
 
 export default authRouter;

@@ -1,4 +1,4 @@
-import { Exception } from "../exception";
+import { Exception } from '../exception';
 
 /**
  * @swagger
@@ -22,6 +22,10 @@ import { Exception } from "../exception";
  */
 export class TokenExpiredException extends Exception {
   constructor() {
-    super({ message: '토큰이 만료되었습니다.', code: 1002, name: 'TokenExpiredException' });
+    super({
+      message: '토큰이 만료되었습니다.',
+      code: 1002,
+      name: 'TokenExpiredException',
+    });
   }
 }

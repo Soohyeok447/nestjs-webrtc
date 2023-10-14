@@ -1,4 +1,4 @@
-import { Exception } from "../exception";
+import { Exception } from '../exception';
 
 /**
  * @swagger
@@ -22,6 +22,10 @@ import { Exception } from "../exception";
  */
 export class MissingFilesException extends Exception {
   constructor() {
-    super({ code: 2, message: '파일이 제공되지 않았습니다.', name: 'MissingFilesException' });
+    super({
+      code: 2,
+      message: '파일이 제공되지 않았습니다.',
+      name: 'MissingFilesException',
+    });
   }
 }

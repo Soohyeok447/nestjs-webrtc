@@ -4,10 +4,12 @@ import { InvalidTokenException } from '../exceptions/auth/InvalidToken';
 import { MissingTokenException } from '../exceptions/auth/MissingTokenException';
 import { JwtPayload } from '../types/jwtPayload';
 import { TokenExpiredException } from '../exceptions/auth/TokenExpiredException';
-import { decode } from 'punycode';
 
-
-export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+export const verifyToken = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const API_KEY = process.env.HAZE_API_KEY;
 
   const accessToken = req.headers['authorization']?.split(' ')[1];

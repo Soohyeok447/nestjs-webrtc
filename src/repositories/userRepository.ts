@@ -1,7 +1,19 @@
-import { User, UserModel } from "../models/userModel";
+import { User, UserModel } from '../models/userModel';
 
 class UserRepository {
-  public async create({ id, socketId, refreshToken, gender, nickname, birth, location, interests, purpose, bans, reported }): Promise<User> {
+  public async create({
+    id,
+    socketId,
+    refreshToken,
+    gender,
+    nickname,
+    birth,
+    location,
+    interests,
+    purpose,
+    bans,
+    reported,
+  }): Promise<User> {
     try {
       const user = new UserModel({
         id,
@@ -57,7 +69,7 @@ class UserRepository {
           bans,
           reported,
         },
-        { new: true }
+        { new: true },
       ).exec();
 
       return updatedUser || null;

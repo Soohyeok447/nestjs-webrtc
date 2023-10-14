@@ -49,7 +49,7 @@ export type Images = {
   readonly createdAt?: Date;
 
   readonly updatedAt?: Date;
-} & CommonModel
+} & CommonModel;
 
 // for mongoose
 export interface ImagesDocument extends Document {
@@ -61,12 +61,15 @@ export interface ImagesDocument extends Document {
 }
 
 // for mongoose
-const ImagesSchema: Schema = new Schema({
-  userId: { type: String, required: true },
-  keys: { type: Array<String>, required: true },
-  urls: { type: Array<String>, required: true, },
-}, {
-  timestamps: true
-});
+const ImagesSchema: Schema = new Schema(
+  {
+    userId: { type: String, required: true },
+    keys: { type: Array<string>, required: true },
+    urls: { type: Array<string>, required: true },
+  },
+  {
+    timestamps: true,
+  },
+);
 
 export const ImagesModel = model<ImagesDocument>('Images', ImagesSchema);

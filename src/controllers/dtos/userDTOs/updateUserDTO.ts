@@ -1,6 +1,4 @@
-import { GENDER_LIST, Gender, INTERESTS_LIST, Interests, LOCATION_LIST, Location, PURPOSE_LIST, Purpose } from "../../../constants";
-import { IsString, IsDateString, IsDefined, IsArray, IsEnum, Matches, IsNotEmpty, Length } from 'class-validator';
-
+import { Interests, Location, Purpose } from '../../../constants';
 
 /**
  * @swagger
@@ -24,7 +22,7 @@ import { IsString, IsDateString, IsDefined, IsArray, IsEnum, Matches, IsNotEmpty
  *           description: 사용자의 닉네임.
  *           example: '사용자닉네임'
  */
-export class UpdateUserDTO {
+export interface UpdateUserDTO {
   readonly id: string; // userId on payload for JWT
 
   readonly nickname: string; // 닉네임

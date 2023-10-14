@@ -1,4 +1,4 @@
-import { Exception } from "../exception";
+import { Exception } from '../exception';
 
 /**
  * @swagger
@@ -22,6 +22,10 @@ import { Exception } from "../exception";
  */
 export class MissingTokenException extends Exception {
   constructor() {
-    super({ code: 1001, message: '토큰이 없습니다.', name: 'MissingTokenException' });
+    super({
+      code: 1001,
+      message: '토큰이 없습니다.',
+      name: 'MissingTokenException',
+    });
   }
 }

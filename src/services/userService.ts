@@ -1,13 +1,35 @@
-import { LOCATION_LIST, INTERESTS_LIST, PURPOSE_LIST, Location, Interests, Purpose, Gender } from "../constants";
-import { UpdateUserDTO } from "../controllers/dtos/userDTOs/updateUserDTO";
-import { InvalidNicknameException, InvalidGenderException, InvalidBirthFormatException, InvalidLocationException, InvalidInterestsException, InvalidPurposeException } from "../exceptions/users";
-import { NotFoundUserException } from "../exceptions/users/NotFoundUserException";
-import { User } from "../models/userModel";
-import { UserResponseModel } from "../models/userResponseModel";
-import UserRepository from "../repositories/userRepository";
+import {
+  LOCATION_LIST,
+  INTERESTS_LIST,
+  PURPOSE_LIST,
+  Location,
+  Interests,
+  Purpose,
+  Gender,
+} from '../constants';
+import { UpdateUserDTO } from '../controllers/dtos/userDTOs/updateUserDTO';
+import {
+  InvalidNicknameException,
+  InvalidGenderException,
+  InvalidBirthFormatException,
+  InvalidLocationException,
+  InvalidInterestsException,
+  InvalidPurposeException,
+} from '../exceptions/users';
+import { NotFoundUserException } from '../exceptions/users/NotFoundUserException';
+import { User } from '../models/userModel';
+import { UserResponseModel } from '../models/userResponseModel';
+import UserRepository from '../repositories/userRepository';
 
 class UserService {
-  public async update({ id, nickname, birth, location, interests, purpose }: UpdateUserDTO): Promise<UserResponseModel | null> {
+  public async update({
+    id,
+    nickname,
+    birth,
+    location,
+    interests,
+    purpose,
+  }: UpdateUserDTO): Promise<UserResponseModel | null> {
     try {
       //validate nickname
       this.validateNickname(nickname);
@@ -34,10 +56,11 @@ class UserService {
         birth,
         location: Array.from(new Set(location)),
         interests: Array.from(new Set(interests)),
-        purpose
-      })
+        purpose,
+      });
 
-      const userResponse: UserResponseModel = this.mapUserToUserResponseModel(updatedUser);
+      const userResponse: UserResponseModel =
+        this.mapUserToUserResponseModel(updatedUser);
 
       return userResponse;
     } catch (error) {
@@ -63,20 +86,24 @@ class UserService {
 
   //정해진 interests 목록만 3개 이하 허용
   public validateInterests(interests: Interests) {
-    if (!interests ||
+    if (
+      !interests ||
       interests.length === 0 ||
-      interests.some(interest => !INTERESTS_LIST.includes(interest)) ||
-      new Set(interests).size > 3) {
+      interests.some((interest) => !INTERESTS_LIST.includes(interest)) ||
+      new Set(interests).size > 3
+    ) {
       throw new InvalidInterestsException();
     }
   }
 
   //정해진 location 목록만 3개 이하 허용
   public validateLocation(location: Location) {
-    if (!location ||
+    if (
+      !location ||
       !location.length ||
-      location.some(loc => !LOCATION_LIST.includes(loc)) ||
-      new Set(location).size > 3) {
+      location.some((loc) => !LOCATION_LIST.includes(loc)) ||
+      new Set(location).size > 3
+    ) {
       throw new InvalidLocationException();
     }
   }
@@ -92,8 +119,8 @@ class UserService {
 
   // MALE, FEMALE 둘 중 하나여야 함
   public validateGender(gender: Gender) {
-    if (!gender ||
-      gender !== "MALE" && gender !== "FEMALE") throw new InvalidGenderException();
+    if (!gender || (gender !== 'MALE' && gender !== 'FEMALE'))
+      throw new InvalidGenderException();
   }
 
   public async findById(id: string): Promise<UserResponseModel | null> {
@@ -102,14 +129,14 @@ class UserService {
 
       if (!user) throw new NotFoundUserException();
 
-      const userResponse: UserResponseModel = this.mapUserToUserResponseModel(user);
+      const userResponse: UserResponseModel =
+        this.mapUserToUserResponseModel(user);
 
       return userResponse;
     } catch (error) {
       throw error;
     }
   }
-
 
   // User Model을 UserResponseModel로 변환
   private mapUserToUserResponseModel(user: User): UserResponseModel {
@@ -131,4 +158,3 @@ class UserService {
 }
 
 export default new UserService();
-

@@ -7,10 +7,22 @@ import { checkFormData } from '../middlewares/checkFormdata';
 const imageRouter = Router();
 
 // 이미지 여러장 POST
-imageRouter.post('/', verifyToken, checkFormData, upload.array('images'), ImageController.createImages);
+imageRouter.post(
+  '/',
+  verifyToken,
+  checkFormData,
+  upload.array('images'),
+  ImageController.createImages,
+);
 
 // 이미지 여러장 PUT
-imageRouter.put('/', verifyToken, checkFormData, upload.array('images'), ImageController.updateImages);
+imageRouter.put(
+  '/',
+  verifyToken,
+  checkFormData,
+  upload.array('images'),
+  ImageController.updateImages,
+);
 
 // 내 이미지 GET
 imageRouter.get('/', verifyToken, ImageController.findMyImages);

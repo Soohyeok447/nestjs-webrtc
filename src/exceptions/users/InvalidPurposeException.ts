@@ -19,10 +19,14 @@
  *           description: 예외 메시지
  */
 
-import { Exception } from "../exception";
+import { Exception } from '../exception';
 
 export class InvalidPurposeException extends Exception {
   constructor() {
-    super({ code: 6, message: '유효하지 않은 purpose입니다.', name: 'InvalidPurposeException' });
+    super({
+      code: 6,
+      message: '유효하지 않은 purpose입니다.',
+      name: 'InvalidPurposeException',
+    });
   }
 }

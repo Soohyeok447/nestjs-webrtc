@@ -1,4 +1,4 @@
-import { Exception } from "../exception";
+import { Exception } from '../exception';
 
 /**
  * @swagger
@@ -22,6 +22,10 @@ import { Exception } from "../exception";
  */
 export class InvalidNicknameException extends Exception {
   constructor() {
-    super({ code: 1, message: 'nickname은 8자 이하 영어,숫자,한글만 허용됩니다.', name: 'InvalidNicknameException' });
+    super({
+      code: 1,
+      message: 'nickname은 8자 이하 영어,숫자,한글만 허용됩니다.',
+      name: 'InvalidNicknameException',
+    });
   }
 }

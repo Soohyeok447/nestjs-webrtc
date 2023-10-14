@@ -1,6 +1,5 @@
-import swaggerJSDoc from "swagger-jsdoc";
+import swaggerJSDoc from 'swagger-jsdoc';
 import { serve, setup } from 'swagger-ui-express';
-
 
 // Swagger options
 export const options = {
@@ -28,15 +27,15 @@ export const options = {
     servers: [
       {
         url: 'http://localhost:3001',
-        description: 'local'
+        description: 'local',
       },
       {
         url: 'http://13.125.38.177:3001',
-        description: 'dev'
+        description: 'dev',
       },
       {
         url: 'http://TBD:3002',
-        description: 'production'
+        description: 'production',
       },
     ],
     components: {
@@ -44,18 +43,15 @@ export const options = {
         bearerAuth: {
           type: 'http',
           scheme: 'bearer',
-          bearerFormat: 'JWT'
-        }
-      }
+          bearerFormat: 'JWT',
+        },
+      },
     },
-    security: [
-      { bearerAuth: [] }
-    ]
+    security: [{ bearerAuth: [] }],
   },
   basedir: __dirname, // App's root folder
   apis: ['./src/**/*.ts'],
 };
-
 
 export const swaggerSpec = swaggerJSDoc(options);
 export { serve, setup };

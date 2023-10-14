@@ -19,10 +19,14 @@
  *           description: 예외 메시지
  */
 
-import { Exception } from "../exception";
+import { Exception } from '../exception';
 
 export class InvalidInterestsException extends Exception {
   constructor() {
-    super({ code: 5, message: '관심사는 정해진 목록 중에서 3개 이하만 허용됩니다.', name: 'InvalidInterestsException' });
+    super({
+      code: 5,
+      message: '관심사는 정해진 목록 중에서 3개 이하만 허용됩니다.',
+      name: 'InvalidInterestsException',
+    });
   }
 }

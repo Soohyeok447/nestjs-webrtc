@@ -1,4 +1,4 @@
-import { Exception } from "../exception";
+import { Exception } from '../exception';
 
 /**
  * @swagger
@@ -22,6 +22,10 @@ import { Exception } from "../exception";
  */
 export class InvalidTokenException extends Exception {
   constructor() {
-    super({ message: '토큰이 유효하지 않습니다.', code: 1000, name: 'InvalidTokenException' });
+    super({
+      message: '토큰이 유효하지 않습니다.',
+      code: 1000,
+      name: 'InvalidTokenException',
+    });
   }
 }

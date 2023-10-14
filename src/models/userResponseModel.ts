@@ -46,6 +46,6 @@
  *           example: 2023-10-04T18:50:48.894Z
  *           description: 업데이트 일자.
  */
-import { User } from "./userModel";
+import { User } from './userModel';
 
 export type UserResponseModel = Omit<User, 'refreshToken'>;

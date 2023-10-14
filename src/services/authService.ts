@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import UUIDService from './../services/uuidService'
+import UUIDService from './../services/uuidService';
 import { Token } from '../types/token';
 import { InvalidTokenException } from '../exceptions/auth/InvalidToken';
 import { FetchOrGenerateTokenDTO } from '../controllers/dtos/authDTOs/fetchOrGenerateTokenDTO';
@@ -11,7 +11,14 @@ class AuthService {
   /**
    * accessToken과 refreshToken 발급 및 User onboarding
    * */
-  public async onBoard({ nickname, gender, birth, location, interests, purpose }: OnBoardDTO): Promise<Token> {
+  public async onBoard({
+    nickname,
+    gender,
+    birth,
+    location,
+    interests,
+    purpose,
+  }: OnBoardDTO): Promise<Token> {
     try {
       /**
        * request body validation
@@ -33,7 +40,6 @@ class AuthService {
 
       //validate purpose
       UserService.validatePurpose(purpose);
-
 
       //onBoarding
       const id = UUIDService.generateUUID();
@@ -60,16 +66,16 @@ class AuthService {
     }
   }
 
-
   /**
    * accessToken과 refreshToken 갱신
    * */
   public async signIn({ userId }: FetchOrGenerateTokenDTO): Promise<Token> {
     try {
-      const { accessToken: newAccessToken, refreshToken } = this.generateTokens(userId);
+      const { accessToken: newAccessToken, refreshToken } =
+        this.generateTokens(userId);
 
       //User DB의 refreshToken을 갱신
-      await UserRepository.update({ id: userId, refreshToken })
+      await UserRepository.update({ id: userId, refreshToken });
 
       return { accessToken: newAccessToken, refreshToken };
     } catch (error) {
@@ -78,21 +84,26 @@ class AuthService {
   }
 
   /**
-   * 세션 유지를 위해 refreshToken을 이용해서 
+   * 세션 유지를 위해 refreshToken을 이용해서
    * accessToken과 refreshToken 갱신
    */
   public async renew({ refreshToken, userId }: RenewTokenDTO): Promise<Token> {
     try {
-      const { refreshToken: foundRefreshToken } = await UserRepository.findById(userId);
+      const { refreshToken: foundRefreshToken } =
+        await UserRepository.findById(userId);
 
       //refreshToken validation
       if (foundRefreshToken !== refreshToken) {
         throw new InvalidTokenException();
       }
 
-      const { accessToken, refreshToken: newRefreshToken } = this.renewToken(refreshToken);
+      const { accessToken, refreshToken: newRefreshToken } =
+        this.renewToken(refreshToken);
 
-      await UserRepository.update({ id: userId, refreshToken: newRefreshToken });
+      await UserRepository.update({
+        id: userId,
+        refreshToken: newRefreshToken,
+      });
 
       return { accessToken, refreshToken: newRefreshToken };
     } catch (error) {
@@ -105,8 +116,12 @@ class AuthService {
     const API_KEY = process.env.HAZE_API_KEY;
 
     try {
-      const accessToken = jwt.sign({ userId, iss: ISS }, API_KEY, { expiresIn: '30m' });
-      const refreshToken = jwt.sign({ userId, iss: ISS }, API_KEY, { expiresIn: '30d' });
+      const accessToken = jwt.sign({ userId, iss: ISS }, API_KEY, {
+        expiresIn: '30m',
+      });
+      const refreshToken = jwt.sign({ userId, iss: ISS }, API_KEY, {
+        expiresIn: '30d',
+      });
 
       return { accessToken, refreshToken };
     } catch (error) {
@@ -120,15 +135,18 @@ class AuthService {
     try {
       const { userId, iss } = jwt.verify(refreshToken, API_KEY) as any;
 
-      const newAccessToken = jwt.sign({ userId, iss }, API_KEY, { expiresIn: '30m' });
-      const newRefreshToken = jwt.sign({ userId, iss }, API_KEY, { expiresIn: '30d' });
-
+      const newAccessToken = jwt.sign({ userId, iss }, API_KEY, {
+        expiresIn: '30m',
+      });
+      const newRefreshToken = jwt.sign({ userId, iss }, API_KEY, {
+        expiresIn: '30d',
+      });
 
       return { accessToken: newAccessToken, refreshToken: newRefreshToken };
     } catch (error) {
       throw error;
     }
-  };
+  }
 
   public verifyToken(token: string): boolean {
     const API_KEY = process.env.HAZE_API_KEY;

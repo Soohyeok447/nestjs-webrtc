@@ -1,5 +1,14 @@
 import { Schema, Document, model } from 'mongoose';
-import { Gender, Location, Interests, Purpose, INTERESTS_LIST, GENDER_LIST, LOCATION_LIST, PURPOSE_LIST } from '../constants';
+import {
+  Gender,
+  Location,
+  Interests,
+  Purpose,
+  INTERESTS_LIST,
+  GENDER_LIST,
+  LOCATION_LIST,
+  PURPOSE_LIST,
+} from '../constants';
 import { CommonModel } from './commonModel';
 
 /**
@@ -76,62 +85,68 @@ export type User = {
   readonly bans: string[];
 
   readonly reported: number;
-} & CommonModel
+} & CommonModel;
 
 // for mongoose
-const UserSchema: Schema = new Schema({
-  id: {
-    type: String,
-    required: true,
-    unique: true
+const UserSchema: Schema = new Schema(
+  {
+    id: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    socketId: {
+      type: String,
+      required: true,
+    },
+    refreshToken: {
+      type: String,
+      required: true,
+    },
+    gender: {
+      type: String,
+      enum: GENDER_LIST,
+      required: true,
+    },
+    nickname: {
+      type: String,
+      required: true,
+    },
+    birth: {
+      type: String,
+      required: true,
+    },
+    location: {
+      type: [
+        {
+          type: String,
+          enum: LOCATION_LIST,
+        },
+      ],
+      required: true,
+    },
+    purpose: {
+      type: String,
+      enum: PURPOSE_LIST,
+      required: true,
+    },
+    interests: {
+      type: [{ type: String, enum: INTERESTS_LIST }],
+      required: true,
+    },
+    bans: {
+      type: [{ type: String }],
+      required: true,
+    },
+    reported: {
+      type: Number,
+      required: true,
+    },
   },
-  socketId: {
-    type: String,
-    required: true
+  {
+    timestamps: true,
   },
-  refreshToken: {
-    type: String,
-    required: true
-  },
-  gender: {
-    type: String,
-    enum: GENDER_LIST,
-    required: true
-  },
-  nickname: {
-    type: String,
-    required: true
-  },
-  birth: {
-    type: String,
-    required: true
-  },
-  location: {
-    type: [{
-      type: String, enum: LOCATION_LIST,
-    }],
-    required: true
-  },
-  purpose: {
-    type: String,
-    enum: PURPOSE_LIST,
-    required: true
-  },
-  interests: {
-    type: [{ type: String, enum: INTERESTS_LIST }],
-    required: true
-  },
-  bans: {
-    type: [{ type: String }],
-    required: true
-  },
-  reported: {
-    type: Number,
-    required: true
-  },
-}, {
-  timestamps: true
-});
+);
 
 // for mongoose
 

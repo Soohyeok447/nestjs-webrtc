@@ -8,4 +8,4 @@ export * from './InvalidLocationException';
 
 export * from './InvalidInterestsException';
 
-export * from './InvalidPurposeException'
+export * from './InvalidPurposeException';

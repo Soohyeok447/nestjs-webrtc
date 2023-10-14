@@ -19,10 +19,14 @@
  *           description: 예외 메시지
  */
 
-import { Exception } from "../exception";
+import { Exception } from '../exception';
 
 export class NotFoundUserException extends Exception {
   constructor() {
-    super({ code: 7, message: '유저를 찾을 수 없습니다.', name: 'NotFoundUserException' });
+    super({
+      code: 7,
+      message: '유저를 찾을 수 없습니다.',
+      name: 'NotFoundUserException',
+    });
   }
 }

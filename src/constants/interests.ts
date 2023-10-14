@@ -24,9 +24,8 @@ export const INTERESTS_LIST = [
   '자기계발',
   '요리',
   '드로잉',
-  '악기연주'
+  '악기연주',
 ] as const;
-
 
 /**
  * @swagger
@@ -66,4 +65,4 @@ export const INTERESTS_LIST = [
  *       description: 사용 가능한 관심사 목록.
  *       example: ['여행', '독서']
  */
-export type Interests = typeof INTERESTS_LIST[number][];
+export type Interests = (typeof INTERESTS_LIST)[number][];

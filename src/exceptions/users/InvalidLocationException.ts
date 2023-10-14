@@ -1,4 +1,4 @@
-import { Exception } from "../exception";
+import { Exception } from '../exception';
 
 /**
  * @swagger
@@ -23,6 +23,10 @@ import { Exception } from "../exception";
 
 export class InvalidLocationException extends Exception {
   constructor() {
-    super({ code: 4, message: 'location은 정해진 지역중 3개 이하만 허용됩니다.', name: 'InvalidLocationException' });
+    super({
+      code: 4,
+      message: 'location은 정해진 지역중 3개 이하만 허용됩니다.',
+      name: 'InvalidLocationException',
+    });
   }
 }

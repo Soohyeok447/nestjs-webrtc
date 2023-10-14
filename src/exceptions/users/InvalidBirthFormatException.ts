@@ -1,4 +1,4 @@
-import { Exception } from "../exception";
+import { Exception } from '../exception';
 
 /**
  * @swagger
@@ -23,6 +23,10 @@ import { Exception } from "../exception";
 
 export class InvalidBirthFormatException extends Exception {
   constructor() {
-    super({ code: 3, message: 'birth는 YYYY-MM-DD 형식이어야 합니다.', name: 'InvalidBirthFormatException' });
+    super({
+      code: 3,
+      message: 'birth는 YYYY-MM-DD 형식이어야 합니다.',
+      name: 'InvalidBirthFormatException',
+    });
   }
 }

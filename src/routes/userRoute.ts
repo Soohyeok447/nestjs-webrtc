@@ -13,6 +13,4 @@ userRouter.get('/me', verifyToken, UserController.findMe);
 // id로 유저 조회
 userRouter.get('/:id', verifyToken, UserController.findById);
 
-
-
 export default userRouter;
