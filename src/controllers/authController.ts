@@ -12,7 +12,6 @@ import {
   InvalidNicknameException,
   InvalidPurposeException,
 } from '../exceptions/users';
-import uuid from 'uuid';
 
 class AuthController {
   /**
@@ -104,89 +103,89 @@ class AuthController {
   }
 
   /**
- * @swagger
- * /api/auth/signin:
- *   post:
- *     summary: 접속 시 토큰 존재여부를 확인 후, 유효한 accessToken일 경우 accessToken과 refreshToken을 갱신
- *     description: '클라이언트가 API를 사용하기 위해선 accessToken이 필요하기 때문에
- *        Haze를 실행하게 되면 `꼭` signin을 호출하는 과정이 필요합니다.<br><br>
- * 
- *        signin을 호출함으로써 토큰의 유효성을 검사하고. api를 사용하기 위한 토큰을 갱신합니다. <br><br>
- * 
- *        accessToken은 Haze API를 호출하는데에 사용되며<br>
- *        refreshToken은 토큰을 갱신하는데에 사용됩니다.<br><br>
- * 
- *        `case 1)` <br>
- *        만약 헤더에 BearerToken이 없는 상태로 호출하게 되면 <br>
- *        401과 함께 MissingTokenException을 response받습니다. <br>
- *        이 경우에는 accessToken을 넣고 재요청을 하거나<br>
- *        onboard를 통해 onBoarding을 시도해야합니다. <br><br>
- * 
- *        `case 2)` <br>
- *        만약 헤더에 유효한 accessToken을 넣고 호출하게 되면 <br>
- *        새로 갱신받은 accessToken과 refreshToken을 response받습니다.<br><br>
- * 
- *        `case 3)` <br>
- *        만약 헤더에 유효하지 않은 accessToken을 넣고 호출하게 되면 <br>
- *        401과 함께 InvalidTokenException을 response받습니다.<br>
- *        이 경우에는 유효한 accessToken을 통해 재요청을 하거나 <br>
- *        onboard를 통해 onBoarding을 시도해야합니다.<br><br>
- * 
- *        `case 4)` <br>
- *        만약 헤더에 만료된 accessToken을 넣고 호출하게 되면 <br>
- *        401과 함께 TokenExpiredException을 response받습니다.<br>
- *        이 경우에는 renew를 통해 토큰을 갱신받아야합니다. <br>
- *        저장된 refreshToken이 없는 경우에는 onboard를 통해 onBoarding을 시도해야합니다. <br><br>
- *        
- * 
- *        `accessToken expiration -> 30분`<br>
- *        `refreshToken expiration -> 30일`<br><br><br>
- * 
- *        `[Header]`<br>
- *        Authorization AccessToken (Required)<br><br><br>
- *        `[Exceptions]`<br>
- *        code: 1000 (401) - 유효하지 않은 토큰일 경우<br>
- *        code: 1001 (401) - 토큰이 제공되지 않은 경우<br>
- *        code: 1002 (401) - 토큰이 만료된 경우'
- * 
- *     tags: [ Auth ]
- *     parameters:
- *       - in: header
- *         name: Authorization
- *         required: true
- *         description: 인증에 사용되는 헤더 토큰.
- *         schema:
- *           type: string
- *           example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMTc1ODQyYS1jYTQwLTQ1NGYtYTc1Mi04ZDFkMmVlYjc1ZDgiLCJpc3MiOiJIQVpFIiwiaWF0IjoxNjk2MjU3ODg2LCJleHAiOjE2OTYyNTk2ODZ9.jVu4mcGi2A1-L3z7XKxIDs8At33y-zFJE7Nu0kmW2aQ
- *     responses:
- *       201:
- *         description: 토큰이 성공적으로 갱신 된 경우. <br>
- *         content:
- *           application/json:
- *             schema:
- *                $ref: '#/components/schemas/Token'
+* @swagger
+* /api/auth/signin:
+*   post:
+*     summary: 접속 시 토큰 존재여부를 확인 후, 유효한 accessToken일 경우 accessToken과 refreshToken을 갱신
+*     description: '클라이언트가 API를 사용하기 위해선 accessToken이 필요하기 때문에
+*        Haze를 실행하게 되면 `꼭` signin을 호출하는 과정이 필요합니다.<br><br>
+* 
+*        signin을 호출함으로써 토큰의 유효성을 검사하고. api를 사용하기 위한 토큰을 갱신합니다. <br><br>
+* 
+*        accessToken은 Haze API를 호출하는데에 사용되며<br>
+*        refreshToken은 토큰을 갱신하는데에 사용됩니다.<br><br>
+* 
+*        `case 1)` <br>
+*        만약 헤더에 BearerToken이 없는 상태로 호출하게 되면 <br>
+*        401과 함께 MissingTokenException을 response받습니다. <br>
+*        이 경우에는 accessToken을 넣고 재요청을 하거나<br>
+*        onboard를 통해 onBoarding을 시도해야합니다. <br><br>
+* 
+*        `case 2)` <br>
+*        만약 헤더에 유효한 accessToken을 넣고 호출하게 되면 <br>
+*        새로 갱신받은 accessToken과 refreshToken을 response받습니다.<br><br>
+* 
+*        `case 3)` <br>
+*        만약 헤더에 유효하지 않은 accessToken을 넣고 호출하게 되면 <br>
+*        401과 함께 InvalidTokenException을 response받습니다.<br>
+*        이 경우에는 유효한 accessToken을 통해 재요청을 하거나 <br>
+*        onboard를 통해 onBoarding을 시도해야합니다.<br><br>
+* 
+*        `case 4)` <br>
+*        만약 헤더에 만료된 accessToken을 넣고 호출하게 되면 <br>
+*        401과 함께 TokenExpiredException을 response받습니다.<br>
+*        이 경우에는 renew를 통해 토큰을 갱신받아야합니다. <br>
+*        저장된 refreshToken이 없는 경우에는 onboard를 통해 onBoarding을 시도해야합니다. <br><br>
+*        
+* 
+*        `accessToken expiration -> 30분`<br>
+*        `refreshToken expiration -> 30일`<br><br><br>
+* 
+*        `[Header]`<br>
+*        Authorization AccessToken (Required)<br><br><br>
+*        `[Exceptions]`<br>
+*        code: 1000 (401) - 유효하지 않은 토큰일 경우<br>
+*        code: 1001 (401) - 토큰이 제공되지 않은 경우<br>
+*        code: 1002 (401) - 토큰이 만료된 경우'
+* 
+*     tags: [ Auth ]
+*     parameters:
+*       - in: header
+*         name: Authorization
+*         required: true
+*         description: 인증에 사용되는 헤더 토큰.
+*         schema:
+*           type: string
+*           example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMTc1ODQyYS1jYTQwLTQ1NGYtYTc1Mi04ZDFkMmVlYjc1ZDgiLCJpc3MiOiJIQVpFIiwiaWF0IjoxNjk2MjU3ODg2LCJleHAiOjE2OTYyNTk2ODZ9.jVu4mcGi2A1-L3z7XKxIDs8At33y-zFJE7Nu0kmW2aQ
+*     responses:
+*       201:
+*         description: 토큰이 성공적으로 갱신 된 경우. <br>
+*         content:
+*           application/json:
+*             schema:
+*                $ref: '#/components/schemas/Token'
 
- *       401:
- *         description: 토큰이 유효하지 않거나 만료된 경우.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/InvalidTokenException'
- * 
- *       500:
- *         description: 내부 서버 오류가 발생한 경우.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 서버 내부 에러
- *                 error:
- *                   type: object
- *                   example: {}
- */
+*       401:
+*         description: 토큰이 유효하지 않거나 만료된 경우.
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/components/schemas/InvalidTokenException'
+* 
+*       500:
+*         description: 내부 서버 오류가 발생한 경우.
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 message:
+*                   type: string
+*                   example: 서버 내부 에러
+*                 error:
+*                   type: object
+*                   example: {}
+*/
   public async signIn({ userId }: Request, res: Response) {
     const fetchOrGenerateToken: FetchOrGenerateTokenDTO = {
       userId,

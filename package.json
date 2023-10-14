@@ -11,8 +11,8 @@
     "dev-c": "concurrently \"rm -rf dist\" \"npx tsc --watch\" \"nodemon\"",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon\"",
     "test": "npx jest --coverage",
-    "lint-src": "eslint src/**/*.ts --fix",
-    "lint-test": "eslint test/**/*.ts --fix"
+    "lint-src": "eslint src/**/*.ts --fix && echo 'Lint completed'",
+    "lint-test": "eslint test/**/*.ts --fix && echo 'Lint completed'"
   },
   "keywords": [],
   "author": "Kimsoohyeok",
