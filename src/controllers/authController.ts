@@ -12,6 +12,7 @@ import {
   InvalidNicknameException,
   InvalidPurposeException,
 } from '../exceptions/users';
+import uuid from 'uuid';
 
 class AuthController {
   /**
