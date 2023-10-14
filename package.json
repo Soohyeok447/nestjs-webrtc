@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
-    "start": "nodemon",
+    "start": "pm2 start dist/index.js --name \"haze\"",
+    "stop": "pm2 stop haze",
+    "dev-start": "nodemon",
     "dev-c": "concurrently \"rm -rf dist\" \"npx tsc --watch\" \"nodemon\"",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon\"",
     "test": "npx jest --coverage"
