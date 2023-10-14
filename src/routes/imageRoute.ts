@@ -25,7 +25,7 @@ imageRouter.put(
 );
 
 // 내 이미지 GET
-imageRouter.get('/', verifyToken, ImageController.findMyImages);
+imageRouter.get('/me', verifyToken, ImageController.findMyImages);
 
 // query로 이미지 GET
 imageRouter.get('/:userId', verifyToken, ImageController.findImages);

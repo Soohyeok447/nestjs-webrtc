@@ -236,7 +236,7 @@ class ImageController {
 
   /**
    * @swagger
-   * /api/images/:
+   * /api/images/me:
    *   get:
    *     summary: 내 이미지 찾기
    *     description: '내 이미지를 찾습니다.<br>
