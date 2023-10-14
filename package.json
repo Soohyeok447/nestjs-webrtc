@@ -10,7 +10,8 @@
     "dev-start": "nodemon",
     "dev-c": "concurrently \"rm -rf dist\" \"npx tsc --watch\" \"nodemon\"",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon\"",
-    "test": "npx jest --coverage"
+    "test": "npx jest --coverage",
+    "lint": "eslint ."
   },
   "keywords": [],
   "author": "Kimsoohyeok",
