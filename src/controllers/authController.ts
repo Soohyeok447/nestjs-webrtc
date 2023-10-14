@@ -166,7 +166,7 @@ class AuthController {
 *                $ref: '#/components/schemas/Token'
 
 *       401:
-*         description: 토큰이 유효하지 않거나 만료된 경우.
+*         description: 토큰이 유효하지 않은경우.
 *         content:
 *           application/json:
 *             schema:
@@ -247,12 +247,6 @@ class AuthController {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/InvalidTokenException'
-   *       400:
-   *         description: 토큰이 Authorization 헤더에 제공되지 않은 경우.
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/MissingTokenException'
    *       500:
    *         description: 내부 서버 오류가 발생한 경우.
    *         content:

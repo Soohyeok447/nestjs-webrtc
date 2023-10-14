@@ -61,27 +61,13 @@ class ImageController {
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 code:
-   *                   type: number
-   *                   example: 2
-   *                 message:
-   *                   type: string
-   *                   example: 파일이 제공되지 않았습니다.
+   *               $ref: '#/components/schemas/TooManyFilesException'
    *       401:
-   *         description:
+   *         description: 토큰이 만료된 경우
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 code:
-   *                   type: number
-   *                   example: 1000
-   *                 message:
-   *                   type: string
-   *                   example: 토큰이 만료되었거나 유효하지 않습니다.
+   *               $ref: '#/components/schemas/TokenExpiredException'
    *       409:
    *         description: 이미 생성한 이미지가 있는데 다시 생성하려고 시도한 경우
    *         content:
@@ -188,6 +174,12 @@ class ImageController {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/TooManyFilesException'
+   *       401:
+   *         description: 토큰이 만료된 경우
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/TokenExpiredException'
    *       404:
    *         description: DB에서 메타데이터를 찾는 것을 실패한 경우
    *         content:
@@ -275,6 +267,12 @@ class ImageController {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/Images'
+   *       401:
+   *         description: 토큰이 만료된 경우
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/TokenExpiredException'
    *       404:
    *         description: DB에서 메타데이터를 찾는 것을 실패한 경우
    *         content:
@@ -361,6 +359,12 @@ class ImageController {
    *           application/json:
    *             schema:
    *               $ref: '#/components/schemas/Images'
+   *       401:
+   *         description: 토큰이 만료된 경우
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/TokenExpiredException'
    *       404:
    *         description: DB에서 메타데이터를 찾는 것을 실패한 경우
    *         content:
