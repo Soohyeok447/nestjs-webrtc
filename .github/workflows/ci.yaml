@@ -20,16 +20,14 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "npm"
+          cache: 'npm'
 
       - name: Install Dependencies
         run: npm i
 
       - name: Lint
-        run: npm run lint
+        run: npm run lint-src
 
-      - name: build
-        run: npm run build
+      # Do Test
 
-      - name: deploy
-        run: npm run deploy
+      # Do Dockerizing
