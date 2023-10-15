@@ -48,7 +48,7 @@ jobs:
         run: npm i
 
       - name: Lint
-        run: npm run lint-src
+        run: npm run lint:src
 
       # Do Test
 

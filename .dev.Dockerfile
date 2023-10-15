@@ -14,4 +14,4 @@ RUN npm i
 
 EXPOSE 3001
 
-CMD ["node", "dist/src/index.js"]
+CMD ["npm","run","start"]

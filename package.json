@@ -5,14 +5,14 @@
   "main": "index.js",
   "scripts": {
     "build": "npx tsc",
-    "start": "pm2 start dist/index.js --name \"haze\"",
-    "stop": "pm2 stop haze",
-    "dev-start": "nodemon",
-    "dev-c": "concurrently \"rm -rf dist\" \"npx tsc --watch\" \"nodemon\"",
+    "start": "node dist/index.js",
+    "pm2:start": "pm2 start dist/index.js --name \"haze\"",
+    "pm2:stop": "pm2 stop haze",
+    "dev:rmrf": "concurrently \"rm -rf dist\" \"npx tsc --watch\" \"nodemon\"",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon\"",
     "test": "npx jest --coverage",
-    "lint-src": "eslint src/**/*.ts --fix && echo 'Lint completed'",
-    "lint-test": "eslint test/**/*.ts --fix && echo 'Lint completed'"
+    "lint:src": "eslint src/**/*.ts --fix && echo 'Lint completed'",
+    "lint:test": "eslint test/**/*.ts --fix && echo 'Lint completed'"
   },
   "keywords": [],
   "author": "Kimsoohyeok",
