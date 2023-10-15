@@ -10,6 +10,9 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
+    permissions:
+      packages: read
+      contents: write
 
     steps:
       - name: Login to DockerHub
