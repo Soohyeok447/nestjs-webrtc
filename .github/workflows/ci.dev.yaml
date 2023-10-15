@@ -1,0 +1,66 @@
+name: Development CI workflow
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Generate .env.development
+        run: |
+          touch .env.development
+
+          echo PORT=${{ secrets.DEV_PORT }} >> .env.development
+          echo SERVER_URL=${{ secrets.DEV_SERVER_URL }} >> .env.development
+          echo DEBUG=${{ secrets.DEV_DEBUG }} >> .env.development
+
+          echo DB_HOST=${{ secrets.DEV_DB_HOST }} >> .env.development
+          echo DB_NAME=${{ secrets.DEV_DB_NAME }} >> .env.development
+
+          echo HAZE_API_KEY=${{ secrets.HAZE_API_KEY }} >> .env.development
+          echo HAZE_API_ISSUER=${{ secrets.HAZE_API_ISSUER }} >> .env.development
+
+          echo AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} >> .env.development
+          echo AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} >> .env.development
+          echo AWS_REGION=${{ secrets.AWS_REGION }} >> .env.development
+
+          echo S3_BUCKET_NAME=${{ secrets.DEV_S3_BUCKET_NAME }} >> .env.development
+
+          cat .env.development
+
+      - name: Install Dependencies
+        run: npm i
+
+      - name: Lint
+        run: npm run lint-src
+
+      # Do Test
+
+      # Do Dockerizing
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push to DockerHub
+        run: |
+          docker build -f .dev.Dockerfile -t haze-dev:latest .
+
+          docker push haze-dev:latest
