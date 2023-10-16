@@ -23,14 +23,14 @@ jobs:
 
       - name: Stop Previous Container
         run: |
-          if [ "$(docker ps -q -f name=haze-api-dev)" ]; then
+          if [ "$(sudo docker ps -q -f name=haze-api-dev)" ]; then
             sudo docker stop haze-api-dev
           fi
         continue-on-error: true
 
       - name: Remove Previous Container
         run: |
-          if [ "$(docker ps -q -a -f name=haze-api-dev)" ]; then
+          if [ "$(sudo docker ps -q -a -f name=haze-api-dev)" ]; then
             sudo docker rm haze-api-dev
           fi
         continue-on-error: true
