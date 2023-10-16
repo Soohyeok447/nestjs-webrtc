@@ -24,7 +24,7 @@ jobs:
       - name: Stop Previous Container
         run: |
           if [ "$(docker ps -q -f name=haze-api-dev)" ]; then
-            docker stop haze-api-dev
+            sudo docker stop haze-api-dev
           fi
         continue-on-error: true
 
@@ -36,4 +36,4 @@ jobs:
         continue-on-error: true
 
       - name: Run Docker Container
-        run: docker run -d -p 3001:3001 ${{ secrets.DOCKER_USERNAME }}/haze-api-dev:latest
+        run: sudo docker run -d -p 3001:3001 ${{ secrets.DOCKER_USERNAME }}/haze-api-dev:latest
