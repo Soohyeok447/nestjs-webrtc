@@ -16,10 +16,7 @@ jobs:
 
     steps:
       - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+        run: sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Pull Docker Image
         run: docker pull ${{ secrets.DOCKER_USERNAME }}/haze-api-dev:latest
