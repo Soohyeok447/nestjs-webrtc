@@ -50,6 +50,9 @@ jobs:
       - name: Lint
         run: npm run lint:src
 
+      - name: Build
+        run: npm run build
+
       # Do Test
 
       # Do Dockerizing
