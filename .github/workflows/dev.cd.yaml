@@ -19,7 +19,7 @@ jobs:
         run: sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Pull Docker Image
-        run: docker pull ${{ secrets.DOCKER_USERNAME }}/haze-api-dev:latest
+        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/haze-api-dev:latest
 
       - name: Stop Previous Container
         run: |
@@ -31,7 +31,7 @@ jobs:
       - name: Remove Previous Container
         run: |
           if [ "$(docker ps -q -a -f name=haze-api-dev)" ]; then
-            docker rm haze-api-dev
+            sudo docker rm haze-api-dev
           fi
         continue-on-error: true
 
