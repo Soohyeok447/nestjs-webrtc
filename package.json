@@ -1,6 +1,6 @@
 {
   "name": "haze-api",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "The NodeJS based Api server for Web Chat Matching and Image Management",
   "main": "index.js",
   "scripts": {
