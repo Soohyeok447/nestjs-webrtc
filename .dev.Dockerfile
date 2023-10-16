@@ -4,7 +4,7 @@ RUN mkdir -p /home/haze-api
 
 WORKDIR /home/haze-api
 
-COPY . ./
+COPY . /home/haze-api
 
 ENV PORT=3001
 ENV NODE_ENV=development
