@@ -17,13 +17,18 @@ dotenv.config({
 
 const app: Express = express();
 const port = process.env.PORT;
+const serverURL = process.env.SERVER_URL;
 
 // const httpServer = createServer(app);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: `${serverURL}:${port}`,
+  }),
+);
 app.disable('x-powered-by');
 
 app.use('/docs', serve, setup(swaggerSpec));
