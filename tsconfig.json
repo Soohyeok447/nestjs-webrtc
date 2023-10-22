@@ -17,6 +17,6 @@
     "allowSyntheticDefaultImports": true,
     "incremental": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "test/**/*.ts"],
   "files": ["./src/types/request.d.ts"]
 }

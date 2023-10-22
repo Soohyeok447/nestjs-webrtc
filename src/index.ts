@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 import bodyParser from 'body-parser';
 import { serve, setup, swaggerSpec } from './config/swagger';
 import { throttle } from './config/throttle';
+import cors from 'cors';
+import helmet from 'helmet';
 
 const environment = process.env.NODE_ENV || 'development';
 
@@ -20,8 +22,8 @@ const port = process.env.PORT;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-//app.use(helmet()); tls적용 후 적용
-//app.use(cors()); tls적용 후 적용
+app.use(helmet());
+app.use(cors());
 app.disable('x-powered-by');
 
 app.use('/docs', serve, setup(swaggerSpec));
