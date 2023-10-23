@@ -6,12 +6,12 @@ WORKDIR /home/haze-api
 
 COPY . /home/haze-api
 
-ENV PORT=3001
+ENV PORT=3000
 ENV NODE_ENV=development
 ENV TZ=Asia/Seoul
 
 RUN npm i
 
-EXPOSE 3001
+EXPOSE 3000
 
 CMD ["npm","run","start"]
