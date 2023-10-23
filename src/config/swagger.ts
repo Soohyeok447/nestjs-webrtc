@@ -30,11 +30,11 @@ export const options = {
         description: 'local',
       },
       {
-        url: 'http://13.125.38.177:3001',
+        url: 'https://dev.haze.monster:3001',
         description: 'dev',
       },
       {
-        url: 'http://TBD:3002',
+        url: 'TBD',
         description: 'production',
       },
     ],
