@@ -5,13 +5,11 @@ export const LOCATION_LIST = ['서울', '경기'] as const;
  * components:
  *   schemas:
  *     Location:
- *       type: array
- *       items:
- *         type: string
- *         enum:
- *           - '서울'
- *           - '경기'
- *       description: 사용 가능한 지역 목록.
- *       example: ['서울','경기']
+ *      type: string
+ *      enum:
+ *        - '서울'
+ *        - '경기'
+ *      description: 지역.
+ *      example: '서울'
  */
-export type Location = (typeof LOCATION_LIST)[number][];
+export type Location = (typeof LOCATION_LIST)[number];

@@ -1,4 +1,4 @@
-import { Interests, Location, Purpose } from '../../../constants';
+import { Interest, Location, Purpose } from '../../../constants';
 
 /**
  * @swagger
@@ -10,9 +10,17 @@ import { Interests, Location, Purpose } from '../../../constants';
  *         purpose:
  *           $ref: '#/components/schemas/Purpose'
  *         interests:
- *           $ref: '#/components/schemas/Interests'
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Interest'
+ *           description: 사용자의 관심사 목록.
+ *           example: ['여행','치맥']
  *         location:
- *           $ref: '#/components/schemas/Location'
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Location'
+ *           description: 사용자의 위치 목록.
+ *           example: ['서울', '경기']
  *         birth:
  *           type: string
  *           description: 사용자의 생년월일.
@@ -27,11 +35,11 @@ export interface UpdateUserDTO {
 
   readonly nickname: string; // 닉네임
 
-  readonly location: Location; // 위치
+  readonly location: Location[]; // 위치
 
   readonly birth: string; // 생년월일
 
   readonly purpose: Purpose; // 만남목적
 
-  readonly interests: Interests; // 관심사목록
+  readonly interests: Interest[]; // 관심사목록
 }

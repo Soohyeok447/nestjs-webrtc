@@ -2,9 +2,9 @@ import { Schema, Document, model } from 'mongoose';
 import {
   Gender,
   Location,
-  Interests,
+  Interest,
   Purpose,
-  INTERESTS_LIST,
+  INTEREST_LIST,
   GENDER_LIST,
   LOCATION_LIST,
   PURPOSE_LIST,
@@ -76,9 +76,9 @@ export type User = {
 
   readonly birth: string;
 
-  readonly location: Location;
+  readonly location: Location[];
 
-  readonly interests: Interests;
+  readonly interests: Interest[];
 
   readonly purpose: Purpose;
 
@@ -131,7 +131,7 @@ const UserSchema: Schema = new Schema(
       required: true,
     },
     interests: {
-      type: [{ type: String, enum: INTERESTS_LIST }],
+      type: [{ type: String, enum: INTEREST_LIST }],
       required: true,
     },
     bans: {
@@ -157,9 +157,9 @@ export interface UserDocument extends Document {
   gender: Gender;
   nickname: string;
   birth: string;
-  location: Location;
+  location: Location[];
   purpose: Purpose;
-  interests: Interests;
+  interests: Interest[];
   bans: string[];
   reported: number;
   createdAt?: Date;

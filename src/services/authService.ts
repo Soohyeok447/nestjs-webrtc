@@ -7,6 +7,14 @@ import { RenewTokenDTO } from '../controllers/dtos/authDTOs/renewTokenDTO';
 import UserRepository from '../repositories/userRepository';
 import { OnBoardDTO } from '../controllers/dtos/authDTOs/onBoardDTO';
 import UserService from './userService';
+import {
+  InvalidBirthFormatException,
+  InvalidGenderException,
+  InvalidInterestsException,
+  InvalidLocationException,
+  InvalidNicknameException,
+  InvalidPurposeException,
+} from '../exceptions/users';
 class AuthService {
   /**
    * accessToken과 refreshToken 발급 및 User onboarding
@@ -24,22 +32,34 @@ class AuthService {
        * request body validation
        * */
       //validate nickname
-      UserService.validateNickname(nickname);
+      if (!UserService.isValidNickname(nickname)) {
+        throw new InvalidNicknameException();
+      }
 
       //validate birth
-      UserService.validateBirth(birth);
+      if (!UserService.isValidBirth(birth)) {
+        throw new InvalidBirthFormatException();
+      }
 
       //validate location
-      UserService.validateLocation(location);
+      if (!UserService.isValidLocation(location)) {
+        throw new InvalidLocationException();
+      }
 
       //validate gender
-      UserService.validateGender(gender);
+      if (!UserService.isValidGender(gender)) {
+        throw new InvalidGenderException();
+      }
 
       //validate interests
-      UserService.validateInterests(interests);
+      if (!UserService.isValidInterests(interests)) {
+        throw new InvalidInterestsException();
+      }
 
       //validate purpose
-      UserService.validatePurpose(purpose);
+      if (!UserService.isValidPurpose(purpose)) {
+        throw new InvalidPurposeException();
+      }
 
       //onBoarding
       const id = UUIDService.generateUUID();

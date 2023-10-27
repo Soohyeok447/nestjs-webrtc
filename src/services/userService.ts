@@ -1,25 +1,23 @@
 import {
   LOCATION_LIST,
-  INTERESTS_LIST,
+  INTEREST_LIST,
   PURPOSE_LIST,
   Location,
-  Interests,
+  Interest,
   Purpose,
-  Gender,
 } from '../constants';
-import { UpdateUserDTO } from '../controllers/dtos/userDTOs/updateUserDTO';
 import {
   InvalidNicknameException,
-  InvalidGenderException,
   InvalidBirthFormatException,
   InvalidLocationException,
   InvalidInterestsException,
   InvalidPurposeException,
+  NotFoundUserException,
 } from '../exceptions/users';
-import { NotFoundUserException } from '../exceptions/users/NotFoundUserException';
 import { User } from '../models/userModel';
 import { UserResponseModel } from '../models/userResponseModel';
 import UserRepository from '../repositories/userRepository';
+import DateService from './dateService';
 
 class UserService {
   public async update({
@@ -29,22 +27,32 @@ class UserService {
     location,
     interests,
     purpose,
-  }: UpdateUserDTO): Promise<UserResponseModel | null> {
+  }): Promise<UserResponseModel | null> {
     try {
       //validate nickname
-      this.validateNickname(nickname);
+      if (!this.isValidNickname(nickname)) {
+        throw new InvalidNicknameException();
+      }
 
       //validate birth
-      this.validateBirth(birth);
+      if (!this.isValidBirth(birth)) {
+        throw new InvalidBirthFormatException();
+      }
 
       //validate location
-      this.validateLocation(location);
+      if (!this.isValidLocation(location)) {
+        throw new InvalidLocationException();
+      }
 
       //validate interests
-      this.validateInterests(interests);
+      if (!this.isValidInterests(interests)) {
+        throw new InvalidInterestsException();
+      }
 
       //validate purpose
-      this.validatePurpose(purpose);
+      if (!this.isValidPurpose(purpose)) {
+        throw new InvalidPurposeException();
+      }
 
       const user: User = await UserRepository.findById(id);
 
@@ -69,58 +77,55 @@ class UserService {
   }
 
   //8자 이하 영어,숫자,한글만 허용
-  public validateNickname(nickname: string) {
+  public isValidNickname(nickname?: string): boolean {
     const nicknameRegex = /^[a-zA-Z0-9가-힣]{1,8}$/;
 
-    if (!nickname || !nicknameRegex.test(nickname)) {
-      throw new InvalidNicknameException();
-    }
+    return !!nickname && nicknameRegex.test(nickname);
   }
 
   //정해진 purpose 리스트만 허용
-  public validatePurpose(purpose: Purpose) {
-    if (!purpose || !PURPOSE_LIST.includes(purpose)) {
-      throw new InvalidPurposeException();
-    }
+  public isValidPurpose(purpose?: string): boolean {
+    const isValid = !!purpose && PURPOSE_LIST.includes(purpose as Purpose);
+
+    return isValid;
   }
 
   //정해진 interests 목록만 3개 이하 허용
-  public validateInterests(interests: Interests) {
-    if (
-      !interests ||
-      interests.length === 0 ||
-      interests.some((interest) => !INTERESTS_LIST.includes(interest)) ||
-      new Set(interests).size > 3
-    ) {
-      throw new InvalidInterestsException();
-    }
+  public isValidInterests(interests?: string[]): boolean {
+    const isValid =
+      !!interests &&
+      interests.length > 0 &&
+      interests.every((interest) =>
+        INTEREST_LIST.includes(interest as Interest),
+      );
+
+    const isNotMoreThanThree = new Set(interests).size <= 3;
+
+    return isValid && isNotMoreThanThree;
   }
 
   //정해진 location 목록만 3개 이하 허용
-  public validateLocation(location: Location) {
-    if (
-      !location ||
-      !location.length ||
-      location.some((loc) => !LOCATION_LIST.includes(loc)) ||
-      new Set(location).size > 3
-    ) {
-      throw new InvalidLocationException();
-    }
+  public isValidLocation(location?: string[]): boolean {
+    const isValid =
+      !!location &&
+      location.length > 0 &&
+      location.every((loc) => LOCATION_LIST.includes(loc as Location));
+
+    const isNotMoreThanThree = new Set(location).size <= 3;
+
+    return isValid && isNotMoreThanThree;
   }
 
   // YYYY-MM-DD 형식이어야 함
-  public validateBirth(birth: string) {
-    const birthRegex = /^\d{4}-\d{2}-\d{2}$/;
-
-    if (!birth || !birthRegex.test(birth)) {
-      throw new InvalidBirthFormatException();
-    }
+  public isValidBirth(birth?: string): boolean {
+    return DateService.isValidDate(birth);
   }
 
   // MALE, FEMALE 둘 중 하나여야 함
-  public validateGender(gender: Gender) {
-    if (!gender || (gender !== 'MALE' && gender !== 'FEMALE'))
-      throw new InvalidGenderException();
+  public isValidGender(gender?: string): boolean {
+    const isValid = !!gender && (gender === 'MALE' || gender === 'FEMALE');
+
+    return isValid;
   }
 
   public async findById(id: string): Promise<UserResponseModel | null> {
