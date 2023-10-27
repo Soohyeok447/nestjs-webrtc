@@ -1,4 +1,6 @@
 import { User } from '../../../src/models/userModel';
+import { createdAt } from './MOCK_CREATEDAT';
+import { updatedAt } from './MOCK_UPDATEDAT';
 
 export const MOCK_USER: User = {
   id: 'userId',
@@ -12,6 +14,6 @@ export const MOCK_USER: User = {
   purpose: '커피한잔',
   bans: [],
   reported: 0,
-  createdAt: new Date(),
-  updatedAt: new Date(),
+  createdAt,
+  updatedAt,
 };

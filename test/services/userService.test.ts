@@ -10,44 +10,12 @@ import {
 } from '../../src/exceptions/users';
 import { UpdateUserDTO } from '../../src/controllers/dtos/userDTOs/updateUserDTO';
 import { Gender } from '../../src/constants';
-import { User } from '../../src/models/userModel';
-import { UserResponseModel } from '../../src/models/userResponseModel';
+import { MOCK_USER, MOCK_RESPONSE_USER } from './constants';
 
 jest.mock('../../src/repositories/userRepository');
 const mockedUserRepository = UserRepository as jest.Mocked<
   typeof UserRepository
 >;
-
-const MOCK_USER: User = {
-  id: 'userId',
-  socketId: 'socketId',
-  refreshToken: 'refreshToken',
-  gender: 'MALE',
-  nickname: '테스트유저',
-  birth: '2000-01-01',
-  location: ['서울', '경기'],
-  interests: ['캠핑', '여행'],
-  purpose: '커피한잔',
-  bans: [],
-  reported: 0,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
-
-const MOCK_RESPONSE_USER: UserResponseModel = {
-  id: 'userId',
-  socketId: 'socketId',
-  gender: 'MALE',
-  nickname: '테스트유저',
-  birth: '2000-01-01',
-  location: ['서울', '경기'],
-  interests: ['캠핑', '여행'],
-  purpose: '커피한잔',
-  bans: [],
-  reported: 0,
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
 
 describe('UserService', () => {
   beforeEach(() => {

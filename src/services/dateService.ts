@@ -1,4 +1,4 @@
-import * as moment from 'moment';
+import moment from 'moment';
 
 class DateService {
   public isValidDate(date?: string): boolean {

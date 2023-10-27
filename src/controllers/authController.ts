@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import AuthService from './../services/authService';
-import { FetchOrGenerateTokenDTO } from './dtos/authDTOs/fetchOrGenerateTokenDTO';
+import { SignInDTO } from './dtos/authDTOs/signInDTO';
 import { RenewTokenDTO } from './dtos/authDTOs/renewTokenDTO';
 import { InvalidTokenException } from '../exceptions/auth/InvalidToken';
 import { OnBoardDTO } from './dtos/authDTOs/onBoardDTO';
@@ -187,7 +187,7 @@ class AuthController {
 *                   example: {}
 */
   public async signIn({ userId }: Request, res: Response) {
-    const fetchOrGenerateToken: FetchOrGenerateTokenDTO = {
+    const fetchOrGenerateToken: SignInDTO = {
       userId,
     };
 

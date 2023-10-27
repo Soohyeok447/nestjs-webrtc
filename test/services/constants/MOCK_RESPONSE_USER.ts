@@ -1,4 +1,6 @@
 import { UserResponseModel } from '../../../src/models/userResponseModel';
+import { createdAt } from './MOCK_CREATEDAT';
+import { updatedAt } from './MOCK_UPDATEDAT';
 
 export const MOCK_RESPONSE_USER: UserResponseModel = {
   id: 'userId',
@@ -11,6 +13,6 @@ export const MOCK_RESPONSE_USER: UserResponseModel = {
   purpose: '커피한잔',
   bans: [],
   reported: 0,
-  createdAt: new Date(),
-  updatedAt: new Date(),
+  createdAt,
+  updatedAt,
 };

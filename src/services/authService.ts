@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import UUIDService from './../services/uuidService';
 import { Token } from '../types/token';
 import { InvalidTokenException } from '../exceptions/auth/InvalidToken';
-import { FetchOrGenerateTokenDTO } from '../controllers/dtos/authDTOs/fetchOrGenerateTokenDTO';
+import { SignInDTO } from '../controllers/dtos/authDTOs/signInDTO';
 import { RenewTokenDTO } from '../controllers/dtos/authDTOs/renewTokenDTO';
 import UserRepository from '../repositories/userRepository';
 import { OnBoardDTO } from '../controllers/dtos/authDTOs/onBoardDTO';
@@ -15,6 +15,7 @@ import {
   InvalidNicknameException,
   InvalidPurposeException,
 } from '../exceptions/users';
+
 class AuthService {
   /**
    * accessToken과 refreshToken 발급 및 User onboarding
@@ -89,7 +90,7 @@ class AuthService {
   /**
    * accessToken과 refreshToken 갱신
    * */
-  public async signIn({ userId }: FetchOrGenerateTokenDTO): Promise<Token> {
+  public async signIn({ userId }: SignInDTO): Promise<Token> {
     try {
       const { accessToken: newAccessToken, refreshToken } =
         this.generateTokens(userId);

@@ -2,13 +2,13 @@
  * @swagger
  * components:
  *   schemas:
- *     FetchOrGenerateTokenDTO:
+ *     SignInDTO:
  *       type: object
  *       properties:
  *         userId:
  *           type: string
  *           description: accessToken 페이로드 속 userId.
  */
-export interface FetchOrGenerateTokenDTO {
+export interface SignInDTO {
   readonly userId: string;
 }
