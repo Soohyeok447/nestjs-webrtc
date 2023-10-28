@@ -4,8 +4,8 @@
   "description": "The NodeJS based Api server for Web Chat Matching and Image Management",
   "main": "index.js",
   "scripts": {
-    "build": "npx tsc",
-    "start": "node dist/index.js",
+    "build": "rm -rf dist && npx tsc -p ./tsconfig.build.json",
+    "start": "node dist/src/index.js",
     "pm2:start": "pm2 start dist/index.js --name \"haze\"",
     "pm2:stop": "pm2 stop haze",
     "dev:rmrf": "concurrently \"rm -rf dist\" \"npx tsc --watch\" \"nodemon\"",
