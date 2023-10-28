@@ -45,10 +45,6 @@ export type Images = {
   readonly keys: string[];
 
   readonly urls: string[];
-
-  readonly createdAt?: Date;
-
-  readonly updatedAt?: Date;
 } & CommonModel;
 
 // for mongoose

@@ -32,7 +32,8 @@ class ImageService {
       if (!files.length) throw new MissingFilesException();
 
       //파일이 FILES_LENGTH보다 많으면 400
-      if ((files.length as number) > FILES_LENGTH) throw TooManyFilesException;
+      if ((files.length as number) > FILES_LENGTH)
+        throw new TooManyFilesException();
 
       const resizedImagesBuffer: Buffer[] = await Promise.all(
         (files as Express.Multer.File[]).map(this._resizeImage),
