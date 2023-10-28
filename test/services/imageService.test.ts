@@ -5,11 +5,11 @@ import { Images } from '../../src/models/imagesModel';
 import { Readable } from 'stream';
 import { MOCK_IMAGES } from './constants/MOCK_IMAGES';
 import sharp from 'sharp'; // 실제 sharp 라이브러리를 import
-import { TooManyFilesException } from '../../src/exceptions/images/TooManyFiles';
-import { OnlyOneImageAllowedException } from '../../src/exceptions/images/OnlyOneImageObjectAllowed';
-import { MissingFilesException } from '../../src/exceptions/images/MissingFiles';
+import { TooManyFilesException } from '../../src/exceptions/images/TooManyFilesException';
+import { OnlyOneImageAllowedException } from '../../src/exceptions/images/OnlyOneImageObjectAllowedException';
+import { MissingFilesException } from '../../src/exceptions/images/MissingFilesException';
 import { UpdateImagesDTO } from '../../src/controllers/dtos/imagesDTOs/updateImagesDTO';
-import { NotFoundImagesException } from '../../src/exceptions/images/NotFoundImages';
+import { NotFoundImagesException } from '../../src/exceptions/images/NotFoundImagesException';
 import { FindImagesDTO } from '../../src/controllers/dtos/imagesDTOs/findImagesDTO';
 
 // imageRepository mocking

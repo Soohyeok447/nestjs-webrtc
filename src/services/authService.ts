@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import UUIDService from './../services/uuidService';
 import { Token } from '../types/token';
-import { InvalidTokenException } from '../exceptions/auth/InvalidToken';
+import { InvalidTokenException } from '../exceptions/auth/InvalidTokenException';
 import { SignInDTO } from '../controllers/dtos/authDTOs/signInDTO';
 import { RenewTokenDTO } from '../controllers/dtos/authDTOs/renewTokenDTO';
 import UserRepository from '../repositories/userRepository';

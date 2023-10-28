@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { JsonWebTokenError, TokenExpiredError, verify } from 'jsonwebtoken';
-import { InvalidTokenException } from '../exceptions/auth/InvalidToken';
+import { InvalidTokenException } from '../exceptions/auth/InvalidTokenException';
 import { MissingTokenException } from '../exceptions/auth/MissingTokenException';
 import { JwtPayload } from '../types/jwtPayload';
 import { TokenExpiredException } from '../exceptions/auth/TokenExpiredException';

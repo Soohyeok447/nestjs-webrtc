@@ -1,7 +1,7 @@
 import AuthService from '../../src/services/authService';
 import UserRepository from '../../src/repositories/userRepository';
 import { Token } from '../../src/types/token';
-import { InvalidTokenException } from '../../src/exceptions/auth/InvalidToken';
+import { InvalidTokenException } from '../../src/exceptions/auth/InvalidTokenException';
 import { RenewTokenDTO } from '../../src/controllers/dtos/authDTOs/renewTokenDTO';
 import { JsonWebTokenError } from 'jsonwebtoken';
 import { OnBoardDTO } from '../../src/controllers/dtos/authDTOs/onBoardDTO';

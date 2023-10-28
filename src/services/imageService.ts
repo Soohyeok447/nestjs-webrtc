@@ -5,11 +5,11 @@ import { Images } from '../models/imagesModel';
 import ImageRepository from '../repositories/imageRepository';
 import UUIDService from './uuidService';
 import { UpdateImagesDTO } from '../controllers/dtos/imagesDTOs/updateImagesDTO';
-import { NotFoundImagesException } from '../exceptions/images/NotFoundImages';
-import { MissingFilesException } from '../exceptions/images/MissingFiles';
-import { OnlyOneImageAllowedException } from '../exceptions/images/OnlyOneImageObjectAllowed';
+import { NotFoundImagesException } from '../exceptions/images/NotFoundImagesException';
+import { MissingFilesException } from '../exceptions/images/MissingFilesException';
+import { OnlyOneImageAllowedException } from '../exceptions/images/OnlyOneImageObjectAllowedException';
 import { FindImagesDTO } from '../controllers/dtos/imagesDTOs/findImagesDTO';
-import { TooManyFilesException } from '../exceptions/images/TooManyFiles';
+import { TooManyFilesException } from '../exceptions/images/TooManyFilesException';
 
 const FILES_LENGTH = 5; //파일 갯수 제한
 

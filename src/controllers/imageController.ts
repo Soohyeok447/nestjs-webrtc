@@ -4,10 +4,10 @@ import { Images } from '../models/imagesModel';
 import { CreateImagesDTO } from './dtos/imagesDTOs/createImagesDTO';
 import { UpdateImagesDTO } from './dtos/imagesDTOs/updateImagesDTO';
 import { FindImagesDTO } from './dtos/imagesDTOs/findImagesDTO';
-import { TooManyFilesException } from '../exceptions/images/TooManyFiles';
-import { OnlyOneImageAllowedException } from '../exceptions/images/OnlyOneImageObjectAllowed';
-import { MissingFilesException } from '../exceptions/images/MissingFiles';
-import { NotFoundImagesException } from '../exceptions/images/NotFoundImages';
+import { TooManyFilesException } from '../exceptions/images/TooManyFilesException';
+import { OnlyOneImageAllowedException } from '../exceptions/images/OnlyOneImageObjectAllowedException';
+import { MissingFilesException } from '../exceptions/images/MissingFilesException';
+import { NotFoundImagesException } from '../exceptions/images/NotFoundImagesException';
 
 class ImageController {
   /**

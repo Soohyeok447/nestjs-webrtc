@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import AuthService from './../services/authService';
 import { SignInDTO } from './dtos/authDTOs/signInDTO';
 import { RenewTokenDTO } from './dtos/authDTOs/renewTokenDTO';
-import { InvalidTokenException } from '../exceptions/auth/InvalidToken';
+import { InvalidTokenException } from '../exceptions/auth/InvalidTokenException';
 import { OnBoardDTO } from './dtos/authDTOs/onBoardDTO';
 import {
   InvalidBirthFormatException,
