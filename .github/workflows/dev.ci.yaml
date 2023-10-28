@@ -42,6 +42,11 @@ jobs:
 
           echo S3_BUCKET_NAME=${{ secrets.DEV_S3_BUCKET_NAME }} >> .env.development
 
+
+
+          echo HAZE_API_KEY=${{ secrets.HAZE_API_KEY }} >> .env.test
+          echo HAZE_API_ISSUER=${{ secrets.HAZE_API_ISSUER }} >> .env.test
+
           cat .env.development
 
       - name: Install Dependencies

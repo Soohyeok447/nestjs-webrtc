@@ -39,11 +39,7 @@ jest
     };
   });
 
-jest
-  .spyOn(ImageService as any, '_purgeStorageImages')
-  .mockImplementation(async () => {
-    console.log();
-  });
+jest.spyOn(ImageService as any, '_purgeStorageImages').mockImplementation();
 
 const USER_ID = 'userId';
 
