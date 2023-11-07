@@ -25,11 +25,12 @@ const SERVER_URL = process.env.SERVER_URL;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
-app.use(
-  cors({
-    origin: `${SERVER_URL}:${PROXY_PORT}`,
-  }),
-);
+
+const corsOptions = {
+  origin: environment === 'development' ? '*' : `${SERVER_URL}:${PROXY_PORT}`,
+};
+app.use(cors(corsOptions));
+
 app.disable('x-powered-by');
 
 app.use('/docs', serve, setup(swaggerSpec));
