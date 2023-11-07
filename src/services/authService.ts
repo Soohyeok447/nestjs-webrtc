@@ -141,7 +141,7 @@ class AuthService {
         expiresIn: '30m',
       });
       const refreshToken = jwt.sign({ userId, iss: ISS }, API_KEY, {
-        expiresIn: '30d',
+        expiresIn: '30y',
       });
 
       return { accessToken, refreshToken };
