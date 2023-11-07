@@ -16,8 +16,9 @@ dotenv.config({
 });
 
 const app: Express = express();
-const port = process.env.PORT;
-const serverURL = process.env.SERVER_URL;
+const PORT = process.env.PORT;
+const PROXY_PORT = (+PORT + 1).toString();
+const SERVER_URL = process.env.SERVER_URL;
 
 // const httpServer = createServer(app);
 
@@ -26,7 +27,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(
   cors({
-    origin: `${serverURL}:${port}`,
+    origin: `${SERVER_URL}:${PROXY_PORT}`,
   }),
 );
 app.disable('x-powered-by');
@@ -36,6 +37,6 @@ app.use('/docs', serve, setup(swaggerSpec));
 app.use('/api', throttle);
 app.use(`/api`, apiRouter);
 
-app.listen(port, () => {
+app.listen(PORT, () => {
   setMongoose();
 });
