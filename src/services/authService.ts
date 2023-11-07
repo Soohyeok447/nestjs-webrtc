@@ -160,7 +160,7 @@ class AuthService {
         expiresIn: '30m',
       });
       const newRefreshToken = jwt.sign({ userId, iss }, API_KEY, {
-        expiresIn: '30d',
+        expiresIn: '30y',
       });
 
       return { accessToken: newAccessToken, refreshToken: newRefreshToken };
