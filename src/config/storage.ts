@@ -19,5 +19,3 @@ export const getAwsCredentials = () =>
       console.log(credentials);
     }
   });
-
-// export default storage;
