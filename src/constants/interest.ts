@@ -25,6 +25,7 @@ export const INTEREST_LIST = [
   '요리',
   '드로잉',
   '악기연주',
+  '위스키',
 ] as const;
 
 /**
@@ -60,6 +61,7 @@ export const INTEREST_LIST = [
  *         - '요리'
  *         - '드로잉'
  *         - '악기연주'
+ *         - '위스키'
  *       description: 관심사.
  *       example: '여행'
  */
