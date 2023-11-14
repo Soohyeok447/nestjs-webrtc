@@ -52,6 +52,12 @@ app.use('/api', throttle);
 app.use(`/api`, apiRouter);
 
 app.listen(PORT, () => {
+  //TODO delete this
+  console.log(environment);
+
+  console.log(process.env.AWS_ACCESS_KEY);
+  console.log(process.env.AWS_SECRET_KEY);
+
   configureAWS();
   getAwsCredentials();
   setMongoose();
