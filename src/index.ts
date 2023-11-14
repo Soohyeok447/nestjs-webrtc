@@ -64,9 +64,9 @@ app.listen(PORT, () => {
 
   storage.listBuckets((err, data) => {
     if (err) {
-      console.error('occured an error:', err);
+      console.error('an error occured:', err);
     } else {
-      console.log('connected to aws s3');
+      console.log('aws s3 connected');
       console.log('bucket list:', data.Buckets);
     }
   });
