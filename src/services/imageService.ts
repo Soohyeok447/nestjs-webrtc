@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import storage from '../config/storage';
+import { storage } from '../config/storage';
 import { CreateImagesDTO } from '../controllers/dtos/imagesDTOs/createImagesDTO';
 import { Images } from '../models/imagesModel';
 import ImageRepository from '../repositories/imageRepository';
@@ -187,7 +187,7 @@ class ImageService {
     try {
       await storage.putObject(params).promise();
     } catch (error) {
-      throw { message: '이미지를 업로드하지 못했습니다.', ...error };
+      throw { message: '이미지를 업로드하지 못했습니다.', error };
     }
 
     return {
@@ -210,11 +210,9 @@ class ImageService {
         try {
           storage.deleteObject(params).promise();
         } catch (error) {
-          console.log(error);
-
           throw {
-            message: 'storage에 있는 이미지 삭제 실패했습니다.',
-            error: error.toString(),
+            message: 'storage에 있는 이미지 삭제에 실패했습니다.',
+            error,
           };
         }
       }),
