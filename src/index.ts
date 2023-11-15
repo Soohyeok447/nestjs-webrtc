@@ -14,7 +14,11 @@ import helmet from 'helmet';
 // import UserRepository from './repositories/userRepository';
 // import ImageRepository from './repositories/imageRepository';
 // import { User, UserModel } from './models/userModel';
-import { configureAWS, getAwsCredentials, storage } from './config/storage';
+import {
+  configureAWS,
+  printAwsCredentials,
+  printS3BucketList,
+} from './config/storage';
 
 const environment = process.env.NODE_ENV || 'development';
 
@@ -59,15 +63,7 @@ app.listen(PORT, () => {
   console.log(process.env.AWS_SECRET_KEY);
 
   configureAWS();
-  getAwsCredentials();
+  printAwsCredentials();
+  printS3BucketList();
   setMongoose();
-
-  storage.listBuckets((err, data) => {
-    if (err) {
-      console.error('an error occured:', err);
-    } else {
-      console.log('aws s3 connected');
-      console.log('bucket list:', data.Buckets);
-    }
-  });
 });
