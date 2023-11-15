@@ -1,6 +1,8 @@
 import AWS, { S3 } from 'aws-sdk';
 
 export const configureAWS = () => {
+  AWS.config.logger = console;
+
   AWS.config.update({
     accessKeyId: process.env.AWS_ACCESS_KEY,
     secretAccessKey: process.env.AWS_SECRET_KEY,
