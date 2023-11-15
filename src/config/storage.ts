@@ -10,12 +10,22 @@ export const configureAWS = () => {
 
 export const storage: AWS.S3 = new S3();
 
-export const getAwsCredentials = () =>
+export const printAwsCredentials = () =>
   AWS.config.getCredentials((err, credentials) => {
     if (err) {
       console.error('AWS configuration update error:', err);
     } else {
       console.log('AWS configuration update complete');
       console.log(credentials);
+    }
+  });
+
+export const printS3BucketList = () =>
+  storage.listBuckets((err, data) => {
+    if (err) {
+      console.error('aws s3 connection error occured: ', err);
+    } else {
+      console.log('aws s3 connected');
+      console.log('bucket list:', data.Buckets);
     }
   });
