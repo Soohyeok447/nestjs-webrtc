@@ -16,6 +16,7 @@ import helmet from 'helmet';
 // import { User, UserModel } from './models/userModel';
 import {
   configureAWS,
+  printAwsConfig,
   printAwsCredentials,
   printS3BucketList,
 } from './config/storage';
@@ -60,9 +61,10 @@ app.listen(PORT, () => {
   console.log(environment);
 
   console.log(process.env.AWS_ACCESS_KEY);
-  console.log(process.env.AWS_SECRET_KEY);
+  console.log(process.env.AWS_SECRET_KEY, '\n\n');
 
   configureAWS();
+  printAwsConfig();
   printAwsCredentials();
   printS3BucketList();
   setMongoose();
