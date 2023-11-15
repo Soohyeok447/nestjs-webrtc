@@ -17,10 +17,14 @@ export const printAwsCredentials = () =>
     if (err) {
       console.error('AWS configuration update error:', err);
     } else {
-      console.log('AWS configuration update complete');
-      console.log(credentials);
+      console.log('AWS configuration update complete \n\n');
+      console.log('AWS Credential => ', credentials, '\n\n');
     }
   });
+
+export const printAwsConfig = () => {
+  console.log('AWS Configuration => ', AWS.config, '\n\n');
+};
 
 export const printS3BucketList = () =>
   storage.listBuckets((err, data) => {
@@ -28,6 +32,6 @@ export const printS3BucketList = () =>
       console.error('aws s3 connection error occured: ', err);
     } else {
       console.log('aws s3 connected');
-      console.log('bucket list:', data.Buckets);
+      console.log('bucket list:', data.Buckets, '\n');
     }
   });
