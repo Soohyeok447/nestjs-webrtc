@@ -22,8 +22,10 @@ export const printAwsCredentials = () =>
     }
   });
 
-export const printAwsConfig = () => {
-  console.log('AWS Configuration => ', AWS.config, '\n\n');
+export const printAwsConfigs = () => {
+  console.log('AWS access key => ', AWS.config.credentials.accessKeyId);
+  console.log('AWS secret key => ', AWS.config.credentials.secretAccessKey);
+  console.log('AWS region => ', AWS.config.region, '\n\n');
 };
 
 export const printS3BucketList = () =>
