@@ -19,6 +19,7 @@ import {
   printAwsConfigs,
   printAwsCredentials,
   printS3BucketList,
+  printStorageInfo,
 } from './config/storage';
 
 const environment = process.env.NODE_ENV || 'development';
@@ -67,6 +68,7 @@ app.listen(PORT, () => {
   configureAWS();
   printAwsConfigs();
   printAwsCredentials();
+  printStorageInfo();
   printS3BucketList();
   setMongoose();
 });

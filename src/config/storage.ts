@@ -37,9 +37,14 @@ export const printAwsConfigs = () => {
 export const printS3BucketList = () =>
   storage.listBuckets((err, data) => {
     if (err) {
-      console.error('aws s3 connection error occured: ', err);
+      console.log('aws s3 connection error occured: ', err);
     } else {
       console.log('aws s3 connected');
-      console.log('bucket list:', data.Buckets, '\n');
+      console.log('data => ', data);
+      console.log('data.buckets => ', data.Buckets, '\n');
     }
   });
+
+export const printStorageInfo = () => {
+  console.log('storage.config.credentials => ', storage.config.credentials);
+};
