@@ -8,7 +8,7 @@ const authRouter = Router();
 authRouter.post('/onboard', AuthController.onBoard);
 
 // token 유효성 확인 및 갱신
-authRouter.post('/signin', verifyToken, AuthController.signIn);
+// authRouter.post('/signin', verifyToken, AuthController.signIn);
 
 // token 갱신
 authRouter.post('/renew', verifyToken, AuthController.renew);
