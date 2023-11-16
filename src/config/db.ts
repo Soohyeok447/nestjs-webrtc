@@ -9,9 +9,9 @@ export function setMongoose() {
       dbName: process.env.DB_NAME,
     } as ConnectOptions)
     .then(() => {
-      console.log('\nDB connected \n');
+      console.log('[DB Connected]');
     })
     .catch((err) => {
-      console.log('DB connection failed: ', err);
+      console.log('[DB Connection failed]\n', err);
     });
 }

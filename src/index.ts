@@ -15,9 +15,7 @@ import helmet from 'helmet';
 // import ImageRepository from './repositories/imageRepository';
 // import { User, UserModel } from './models/userModel';
 import {
-  configureAWS,
-  printAwsConfigs,
-  printAwsCredentials,
+  configureS3,
   printS3BucketList,
   printStorageInfo,
 } from './config/storage';
@@ -58,12 +56,7 @@ app.use('/api', throttle);
 app.use(`/api`, apiRouter);
 
 app.listen(PORT, () => {
-  //TODO delete this
-  console.log('environment - ', environment);
-
-  configureAWS();
-  printAwsConfigs();
-  printAwsCredentials();
+  configureS3();
   printStorageInfo();
   printS3BucketList();
   setMongoose();
