@@ -63,11 +63,13 @@ jobs:
 
       - name: Configure AWS credentials
         run: |
-          mkdir -p /home/runner/.aws
-          echo "[default]" >> /home/runner/.aws/credentials
-          echo "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY }}" >> /home/runner/.aws/credentials
-          echo "aws_secret_access_key=${{ secrets.AWS_SECRET_KEY }}" >> /home/runner/.aws/credentials
-          echo "region=ap-northeast-2" >> /home/runner/.aws/credentials
+          mkdir -p /home/runner/credentials
+          echo "[default]" >> /home/runner/credentials
+          echo "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY }}" >> /home/runner/credentials
+          echo "aws_secret_access_key=${{ secrets.AWS_SECRET_KEY }}" >> /home/runner/credentials
+          echo "region=ap-northeast-2" >> /home/runner/credentials
+
+          cp /home/runner/credentials .
 
       # Do Dockerizing
       - name: Login to DockerHub
@@ -78,9 +80,6 @@ jobs:
 
       - name: Build and Push to DockerHub
         run: |
-          docker build -f .dev.Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/haze-api-dev:latest \
-            --build-arg AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }} \
-            --build-arg AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }} \
-            --build-arg AWS_REGION=${{ secrets.AWS_REGION }} .
+          docker build -f .dev.Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/haze-api-dev:latest .
 
           docker push ${{ secrets.DOCKER_USERNAME }}/haze-api-dev:latest

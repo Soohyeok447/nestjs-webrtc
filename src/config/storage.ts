@@ -65,10 +65,28 @@ export const printS3BucketList = async () => {
   });
 };
 
-export const printStorageInfo = () => {
+export const printStorageInfo = async () => {
   console.log('[printStroageInfo()]');
   console.log('storage => ', storage, '\n');
   console.log('storage.config => ', storage.config, '\n');
+  console.log(
+    'storage.config.credentialProvider.providers => ',
+    storage.config.credentialProvider.providers,
+    '\n',
+  );
+  console.log(
+    'storage.config.credentialProvider.resolve => ',
+    storage.config.credentialProvider.resolve((err, credentials) => {
+      console.log('err => ', err);
+      console.log('credentials => ', credentials);
+    }),
+    '\n',
+  );
+  console.log(
+    'storage.config.credentialProvider.resolvePromise => ',
+    await storage.config.credentialProvider.resolvePromise(),
+    '\n',
+  );
   console.log(
     'storage.config.credentials => ',
     storage.config.credentials,
