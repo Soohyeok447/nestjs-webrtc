@@ -61,10 +61,6 @@ app.listen(PORT, () => {
   //TODO delete this
   console.log('environment - ', environment);
 
-  console.log('[env] s3 bucket name - ', process.env.S3_BUCKET_NAME);
-  console.log('[env] aws accesskey - ', process.env.AWS_ACCESS_KEY);
-  console.log('[env] aws secretkey - ', process.env.AWS_SECRET_KEY, '\n\n');
-
   configureAWS();
   printAwsConfigs();
   printAwsCredentials();
