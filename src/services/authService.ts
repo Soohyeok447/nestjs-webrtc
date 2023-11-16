@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import UUIDService from './../services/uuidService';
 import { Token } from '../types/token';
 import { InvalidTokenException } from '../exceptions/auth/InvalidTokenException';
-import { SignInDTO } from '../controllers/dtos/authDTOs/signInDTO';
+// import { SignInDTO } from '../controllers/dtos/authDTOs/signInDTO';
 import { RenewTokenDTO } from '../controllers/dtos/authDTOs/renewTokenDTO';
 import UserRepository from '../repositories/userRepository';
 import { OnBoardDTO } from '../controllers/dtos/authDTOs/onBoardDTO';
@@ -87,28 +87,27 @@ class AuthService {
     }
   }
 
-  /**
-   * accessToken과 refreshToken 갱신
-   * */
-  public async signIn({ userId }: SignInDTO): Promise<Token> {
-    try {
-      const { accessToken: newAccessToken, refreshToken } =
-        this.generateTokens(userId);
+  // /**
+  //  * accessToken과 refreshToken 갱신
+  //  * */
+  // public async signIn({ userId }: SignInDTO): Promise<{ accessToken: string }> {
+  //   try {
+  //     const { accessToken: newAccessToken } = this.generateTokens(userId);
 
-      //User DB의 refreshToken을 갱신
-      await UserRepository.update({ id: userId, refreshToken });
-
-      return { accessToken: newAccessToken, refreshToken };
-    } catch (error) {
-      throw error;
-    }
-  }
+  //     return { accessToken: newAccessToken };
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
 
   /**
    * 세션 유지를 위해 refreshToken을 이용해서
-   * accessToken과 refreshToken 갱신
+   * accessToken 갱신
    */
-  public async renew({ refreshToken, userId }: RenewTokenDTO): Promise<Token> {
+  public async renew({
+    refreshToken,
+    userId,
+  }: RenewTokenDTO): Promise<{ accessToken: string }> {
     try {
       const { refreshToken: foundRefreshToken } =
         await UserRepository.findById(userId);
@@ -118,15 +117,9 @@ class AuthService {
         throw new InvalidTokenException();
       }
 
-      const { accessToken, refreshToken: newRefreshToken } =
-        this.renewToken(refreshToken);
+      const { accessToken } = this.renewToken(refreshToken);
 
-      await UserRepository.update({
-        id: userId,
-        refreshToken: newRefreshToken,
-      });
-
-      return { accessToken, refreshToken: newRefreshToken };
+      return { accessToken };
     } catch (error) {
       throw error;
     }
