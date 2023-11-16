@@ -76,6 +76,11 @@ class UserService {
     }
   }
 
+  //socketId가 유효한지
+  public isValidSocketId(socketId?: string): boolean {
+    return !!socketId;
+  }
+
   //8자 이하 영어,숫자,한글만 허용
   public isValidNickname(nickname?: string): boolean {
     const nicknameRegex = /^[a-zA-Z0-9가-힣]{1,8}$/;

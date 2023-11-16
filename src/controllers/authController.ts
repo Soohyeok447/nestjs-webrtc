@@ -12,6 +12,7 @@ import {
   InvalidNicknameException,
   InvalidPurposeException,
 } from '../exceptions/users';
+import { InvalidSocketIdException } from '../exceptions/users/InvalidSocketIdException';
 
 class AuthController {
   /**
@@ -37,7 +38,8 @@ class AuthController {
    *        code: 3 (400) - InvalidBirthFormatException. birth는 YYYY-MM-DD 형식이어야 합니다.<br>
    *        code: 4 (400) - InvalidLocationException. location은 정해진 지역 중에서 3개 이하만 허용됩니다.<br>
    *        code: 5 (400) - InvalidInterestsException. 관심사는 정해진 목록 중에서 3개 이하만 허용됩니다.<br>
-   *        code: 6 (400) - InvalidPurposeException. 유효하지 않은 만남 purpose입니다.<br>'
+   *        code: 6 (400) - InvalidPurposeException. 유효하지 않은 만남 purpose입니다.<br>
+   *        code: 7 (400) - InvalidSocketIdException. SocketId가 있어야합니다.'
    *     tags: [ Auth ]
    *     requestBody:
    *       content:
@@ -73,6 +75,7 @@ class AuthController {
    */
   public async onBoard({ body }: Request, res: Response) {
     const onBoardDTO: OnBoardDTO = {
+      socketId: body.socketId,
       gender: body.gender,
       nickname: body.nickname,
       location: body.location,
@@ -92,6 +95,7 @@ class AuthController {
         error instanceof InvalidGenderException ||
         error instanceof InvalidBirthFormatException ||
         error instanceof InvalidLocationException ||
+        error instanceof InvalidSocketIdException ||
         error instanceof InvalidInterestsException ||
         error instanceof InvalidPurposeException
       ) {
