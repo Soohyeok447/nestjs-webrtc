@@ -58,10 +58,11 @@ app.use(`/api`, apiRouter);
 
 app.listen(PORT, () => {
   //TODO delete this
-  console.log(environment);
+  console.log('environment - ', environment);
 
-  console.log(process.env.AWS_ACCESS_KEY);
-  console.log(process.env.AWS_SECRET_KEY, '\n\n');
+  console.log('[env] s3 bucket name - ', process.env.S3_BUCKET_NAME);
+  console.log('[env] aws accesskey - ', process.env.AWS_ACCESS_KEY);
+  console.log('[env] aws secretkey - ', process.env.AWS_SECRET_KEY, '\n\n');
 
   configureAWS();
   printAwsConfigs();
