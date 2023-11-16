@@ -18,14 +18,20 @@ export const printAwsCredentials = () =>
       console.error('AWS configuration update error:', err);
     } else {
       console.log('AWS configuration update complete \n\n');
-      console.log('AWS Credential => ', credentials, '\n\n');
+      console.log('[AWS Credential] AWS Credential => ', credentials, '\n\n');
     }
   });
 
 export const printAwsConfigs = () => {
-  console.log('AWS access key => ', AWS.config.credentials.accessKeyId);
-  console.log('AWS secret key => ', AWS.config.credentials.secretAccessKey);
-  console.log('AWS region => ', AWS.config.region, '\n\n');
+  console.log(
+    '[AWS.config] AWS access key => ',
+    AWS.config.credentials.accessKeyId,
+  );
+  console.log(
+    '[AWS.config] AWS secret key => ',
+    AWS.config.credentials.secretAccessKey,
+  );
+  console.log('[AWS.config] AWS region => ', AWS.config.region, '\n\n');
 };
 
 export const printS3BucketList = () =>
