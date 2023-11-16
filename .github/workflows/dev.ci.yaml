@@ -63,8 +63,7 @@ jobs:
 
       - name: Configure AWS credentials
         run: |
-          mkdir -p /home/runner/credentials
-          echo "[default]" >> /home/runner/credentials
+          echo "[default]" > /home/runner/credentials
           echo "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY }}" >> /home/runner/credentials
           echo "aws_secret_access_key=${{ secrets.AWS_SECRET_KEY }}" >> /home/runner/credentials
           echo "region=ap-northeast-2" >> /home/runner/credentials
