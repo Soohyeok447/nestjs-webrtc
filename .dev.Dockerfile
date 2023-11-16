@@ -6,6 +6,8 @@ WORKDIR /home/haze-api
 
 COPY . /home/haze-api
 
+COPY /home/runner/.aws /root/.aws
+
 ENV PORT=3000
 ENV NODE_ENV=development
 ENV TZ=Asia/Seoul
