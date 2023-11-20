@@ -91,6 +91,7 @@ describe('AuthService', () => {
         birth: '2000-01-01',
         purpose: '진지한연애',
         interests: ['PC방'],
+        socketId: 'socketId',
       };
 
       const tokens: Token = await AuthService.onBoard(onBoardDTO);
@@ -107,6 +108,7 @@ describe('AuthService', () => {
         birth: '200011-01-01',
         purpose: '진지한연애',
         interests: ['PC방'],
+        socketId: 'socketId',
       };
 
       try {

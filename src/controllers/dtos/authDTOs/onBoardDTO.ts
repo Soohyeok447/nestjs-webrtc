@@ -7,6 +7,10 @@ import { Gender, Interest, Location, Purpose } from '../../../constants';
  *     OnBoardDTO:
  *       type: object
  *       properties:
+ *         socketId:
+ *           type: string
+ *           description: socketId.
+ *           example: 'q5d-8PzKUCCY7Kj6SAAAF'
  *         purpose:
  *           $ref: '#/components/schemas/Purpose'
  *         interests:
@@ -33,6 +37,8 @@ import { Gender, Interest, Location, Purpose } from '../../../constants';
  *           example: '사용자닉네임'
  */
 export interface OnBoardDTO {
+  readonly socketId: string; // socketId
+
   readonly gender: Gender; // 성별
 
   readonly nickname: string; // 닉네임
