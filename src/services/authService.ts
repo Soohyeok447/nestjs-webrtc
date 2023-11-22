@@ -15,14 +15,12 @@ import {
   InvalidNicknameException,
   InvalidPurposeException,
 } from '../exceptions/users';
-import { InvalidSocketIdException } from '../exceptions/users/InvalidSocketIdException';
 
 class AuthService {
   /**
    * accessToken과 refreshToken 발급 및 User onboarding
    * */
   public async onBoard({
-    socketId,
     nickname,
     gender,
     birth,
@@ -34,11 +32,6 @@ class AuthService {
       /**
        * request body validation
        * */
-
-      //validate socketId
-      if (!UserService.isValidSocketId(socketId)) {
-        throw new InvalidSocketIdException();
-      }
 
       //validate nickname
       if (!UserService.isValidNickname(nickname)) {
@@ -78,7 +71,6 @@ class AuthService {
       await UserRepository.create({
         id,
         nickname,
-        socketId,
         refreshToken,
         gender,
         birth,

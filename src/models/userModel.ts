@@ -22,10 +22,6 @@ import { CommonModel } from './commonModel';
  *           type: string
  *           example: f2804e89-455e-4fb1-b7cb-a5aa1865ea5f
  *           description: 유저 ID.
- *         socketId:
- *           type: string
- *           example: f2804e89-455e-4fb1-b7cb-a5aa1865ea5f
- *           description: 소켓 ID.
  *         refreshToken:
  *           type: string
  *           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMTc1ODQyYS1jYTQwLTQ1NGYtYTc1Mi04ZDFkMmVlYjc1ZDgiLCJpc3MiOiJIQVpFIiwiaWF0IjoxNjk2MjU3ODg2LCJleHAiOjE2OTYyNTk2ODZ9.jVu4mcGi2A1-L3z7XKxIDs8At33y-zFJE7Nu0kmW2aQ
@@ -94,10 +90,6 @@ const UserSchema: Schema = new Schema(
       type: String,
       required: true,
       unique: true,
-    },
-    socketId: {
-      type: String,
-      required: true,
     },
     refreshToken: {
       type: String,

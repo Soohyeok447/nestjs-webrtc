@@ -45,6 +45,12 @@ export const options = {
       현재 onboard 테스트를 위해서는 socketId에 아무 string이나 넣으면 됨. (socketId 필드가 비어있으면 400 exception)
 
       추후 socket 서버가 구현이 되면 socket에 생성된 socketId를 파라미터에 넣고 onboard하면 됨.
+
+
+      -231123-
+      /auth/onboard request body에 socketId삭제:
+      socketId: String 필드가 삭제됨
+      
       `,
     },
     servers: [
