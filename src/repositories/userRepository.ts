@@ -3,7 +3,6 @@ import { User, UserModel } from '../models/userModel';
 class UserRepository {
   public async create({
     id,
-    socketId,
     refreshToken,
     gender,
     nickname,
@@ -17,7 +16,6 @@ class UserRepository {
     try {
       const user = new UserModel({
         id,
-        socketId,
         refreshToken,
         gender,
         nickname,

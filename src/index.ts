@@ -1,5 +1,4 @@
-import express, { Express } from 'express';
-// import { createServer } from "http";
+import express from 'express';
 import { setMongoose } from './config/db';
 import apiRouter from './routes/apiRoute';
 import dotenv from 'dotenv';
@@ -8,8 +7,8 @@ import { serve, setup, swaggerSpec } from './config/swagger';
 import { throttle } from './config/throttle';
 import cors from 'cors';
 import helmet from 'helmet';
-// import { createServer } from 'http';
-// import { Server, Socket } from 'socket.io';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 
 // import UserRepository from './repositories/userRepository';
 // import ImageRepository from './repositories/imageRepository';
@@ -26,18 +25,19 @@ dotenv.config({
   path: `.env.${environment}`,
 });
 
-const app: Express = express();
 const PORT = process.env.PORT;
 const PROXY_PORT = (+PORT + 1).toString();
 const SERVER_URL = process.env.SERVER_URL;
 
-// const httpServer = createServer(app);
-// const io = new Server(httpServer);
+const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: '*',
+  },
+});
 
-app.use(
-  '/socket.io',
-  express.static(__dirname + '/node_modules/socket.io/client-dist'),
-);
+app.use('/socket.io', express.static('node_modules/socket.io/client-dist'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -55,9 +55,17 @@ app.use('/docs', serve, setup(swaggerSpec));
 app.use('/api', throttle);
 app.use(`/api`, apiRouter);
 
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   configureS3();
   printStorageInfo();
   printS3BucketList();
   setMongoose();
+});
+
+io.on('connection', (socket) => {
+  console.log(`연결된 socketId => ${socket.id}`);
+
+  socket.on('disconnect', () => {
+    console.log(`Socket disconnected: ${socket.id}`);
+  });
 });

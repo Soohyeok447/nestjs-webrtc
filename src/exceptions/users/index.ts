@@ -11,3 +11,5 @@ export * from './InvalidInterestsException';
 export * from './InvalidPurposeException';
 
 export * from './NotFoundUserException';
+
+export * from './InvalidSocketIdException';
