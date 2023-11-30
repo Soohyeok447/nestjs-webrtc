@@ -43,7 +43,6 @@ class UserRepository {
 
   public async update({
     id,
-    socketId,
     refreshToken,
     nickname,
     birth,
@@ -57,7 +56,6 @@ class UserRepository {
       const updatedUser = await UserModel.findOneAndUpdate(
         { id },
         {
-          socketId,
           refreshToken,
           nickname,
           birth,

@@ -38,7 +38,7 @@ class AuthController {
    *        code: 3 (400) - InvalidBirthFormatException. birth는 YYYY-MM-DD 형식이어야 합니다.<br>
    *        code: 4 (400) - InvalidLocationException. location은 정해진 지역 중에서 3개 이하만 허용됩니다.<br>
    *        code: 5 (400) - InvalidInterestsException. 관심사는 정해진 목록 중에서 3개 이하만 허용됩니다.<br>
-   *        code: 6 (400) - InvalidPurposeException. 유효하지 않은 만남 purpose입니다.<br>
+   *        code: 6 (400) - InvalidPurposeException. 유효하지 않은 만남 purpose입니다.'
    *     tags: [ Auth ]
    *     requestBody:
    *       content:
@@ -212,14 +212,14 @@ class AuthController {
    *   post:
    *     summary: 세션유지를 위해 refreshToken을 이용해서 accessToken를 갱신.
    *     description: '클라이언트가 Api를 사용하는 도중 TokenExpiredException을 response받게 되면<br>
-   *          저장된 refreshToken을 이용해서 accessToken을 갱신해야합니다.<br><br>
+   *        저장된 refreshToken을 이용해서 accessToken을 갱신해야합니다.<br><br>
    *
-   *          renew에 성공했을 경우에는 갱신받은 accessToken을 저장한 뒤, 계속 api를 호출하면 됩니다.<br>
-   *          renew에 실패했을 경우에는 더 이상 유저 정보를 찾을 수는 없으며,<br>
-   *          onboard를 통해 새로운 accessToken과 refreshToken을 발급 받아야합니다.<br><br>
+   *        renew에 성공했을 경우에는 갱신받은 accessToken을 저장한 뒤, 계속 api를 호출하면 됩니다.<br>
+   *        renew에 실패했을 경우에는 더 이상 유저 정보를 찾을 수는 없으며,<br>
+   *        onboard를 통해 새로운 accessToken과 refreshToken을 발급 받아야합니다.<br><br>
    *
-   *          만약 refreshToken이 유효하면 토큰을 갱신하고,<br>
-   *          토큰이 없거나 유효하지 않거나 만료된 경우(401) onboard를 통해 onboard하면 됩니다.<br><br><br>
+   *        만약 refreshToken이 유효하면 토큰을 갱신하고,<br>
+   *        토큰이 없거나 유효하지 않거나 만료된 경우(401) onboard를 통해 onboard하면 됩니다.<br><br><br>
    *
    *        `case 1)` <br>
    *        만약 헤더에 BearerToken이 없는 상태로 호출하게 되면 <br>

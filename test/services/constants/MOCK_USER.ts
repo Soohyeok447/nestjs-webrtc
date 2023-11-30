@@ -4,7 +4,6 @@ import { updatedAt } from './MOCK_UPDATEDAT';
 
 export const MOCK_USER: User = {
   id: 'userId',
-  socketId: 'socketId',
   refreshToken: 'refreshToken',
   gender: 'MALE',
   nickname: '테스트유저',
