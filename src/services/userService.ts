@@ -152,7 +152,6 @@ class UserService {
   private mapUserToUserResponseModel(user: User): UserResponseModel {
     return {
       id: user.id,
-      socketId: user.socketId,
       gender: user.gender,
       nickname: user.nickname,
       birth: user.birth,

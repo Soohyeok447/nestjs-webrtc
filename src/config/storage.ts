@@ -11,19 +11,19 @@ export const configureS3 = () => {
 };
 
 export const printS3BucketList = async () => {
-  storage.listBuckets((err, data) => {
+  storage.listBuckets((err) => {
     if (err) {
       console.log('[AWS S3 Connection error occured]\n', err);
     } else {
       console.log('[AWS S3 Connected]');
-      console.log('S3BucketData =>', data);
+      // console.log('[S3BucketData] =>', data);
     }
   });
 };
 
 export const printStorageInfo = async () => {
   console.log(
-    'storage.config.credentials => ',
+    '[storage.config.credentials] => ',
     storage.config.credentials,
     '\n',
   );

@@ -64,8 +64,6 @@ export type User = {
 
   readonly nickname: string;
 
-  readonly socketId: string;
-
   readonly refreshToken: string;
 
   readonly gender: Gender;
