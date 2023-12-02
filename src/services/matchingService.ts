@@ -17,7 +17,7 @@ class MatchingService {
   }
 
   /**
-   * 매칭을 시작
+   * 소개매칭 대기 시작
    */
   public async startMatching(socket: Socket, userId: string) {
     console.log(
@@ -191,13 +191,17 @@ class MatchingService {
         console.log('pendingUsers.size', this.pendingUsers.size);
 
         //re matching
-        setTimeout(() => {
-          mySocket.emit('restart_matching_request');
-        }, 1000);
+        if (mySocket.connected) {
+          setTimeout(() => {
+            mySocket.emit('restart_matching_request');
+          }, 1000);
+        }
 
-        setTimeout(() => {
-          partnerSocket.emit('restart_matching_request');
-        }, 3000);
+        if (partnerSocket.connected) {
+          setTimeout(() => {
+            partnerSocket.emit('restart_matching_request');
+          }, 3000);
+        }
       }
     }, 10000);
   }
@@ -249,13 +253,17 @@ class MatchingService {
       console.log('pendingUsers.size', this.pendingUsers.size);
 
       //re matching
-      setTimeout(() => {
-        mySocket.emit('restart_matching_request');
-      }, 1000);
+      if (mySocket.connected) {
+        setTimeout(() => {
+          mySocket.emit('restart_matching_request');
+        }, 1000);
+      }
 
-      setTimeout(() => {
-        partnerSocket.emit('restart_matching_request');
-      }, 3000);
+      if (partnerSocket.connected) {
+        setTimeout(() => {
+          partnerSocket.emit('restart_matching_request');
+        }, 3000);
+      }
     }
 
     // socket response 정보가 상호 accept일 때
@@ -320,8 +328,32 @@ class MatchingService {
       partnerSocket['response'] = null;
 
       // 상대에게 partner_disconnected 이벤트 전송 (다시 매칭 시도)
-      partnerSocket.emit('partner_disconnected');
+      if (partnerSocket.connected) {
+        partnerSocket.emit('partner_disconnected');
+      }
     }
+  }
+
+  /**
+   * 소개매칭 대기를 취소 함
+   */
+  public async cancelMatching(socket: Socket, userId: string) {
+    // socket의 status가 waiting인지 확인
+    if (socket['status'] !== 'waiting') {
+      socket.emit('not_waiting');
+
+      return;
+    }
+
+    //소켓의 status를 idle로 설정
+    socket['status'] = 'idle';
+
+    this.waitingUsers.delete(userId);
+
+    console.log(
+      'cancelMatching 발생. waitingUsers.size',
+      this.waitingUsers.size,
+    );
   }
 }
 
