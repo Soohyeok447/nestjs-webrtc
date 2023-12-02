@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io';
-import MatchingService from './MatchingService';
+import MatchingService from './matchingService';
 
 class SocketManager {
   private io: Server;
