@@ -10,39 +10,42 @@ class SocketManager {
 
   public initialize() {
     this.io.on('connection', (socket: Socket) => {
-      console.log(this.io.sockets.adapter.sids);
+      // console.log(this.io.sockets.adapter.sids);
+      console.log(socket.id, '접속');
 
-      //소켓 status를 idle로 설정
+      // 소켓 status를 idle로 설정
       socket['status'] = 'idle';
 
-      // 매칭 시작
-      socket.on('startMatching', async (userId) => {
+      // 소개매칭 시작
+      socket.on('start_matching', async (userId) => {
         MatchingService.startMatching(socket, userId);
       });
 
-      // Accept 또는 Decline 처리
+      // 소개매칭 phase에서 Accept 또는 Decline 처리
       socket.on(
-        'userResponse',
-        (userId: string, matchedUserId: string, response: string) => {
-          const matchedUserSocket =
-            MatchingService.getUserSocketUsingUserId(matchedUserId);
+        'respond_to_introduce',
+        (myUserId: string, myResponse: string) => {
+          const partnerUserId = socket['partnerUserId'];
 
-          if (matchedUserSocket) {
+          const partnerSocket = socket['partnerSocket'];
+
+          if (partnerSocket) {
             MatchingService.handleUserResponse(
               socket,
-              matchedUserSocket,
-              userId,
-              matchedUserId,
-              response,
+              partnerSocket,
+              myUserId,
+              partnerUserId,
+              myResponse,
             );
           } else {
-            console.log('소켓이 없는데요?');
+            //TODO 클라이언트를 위한 이벤트 생성
+            console.log('소켓이 없습니다.');
           }
         },
       );
 
       socket.on('disconnect', () => {
-        console.log('연결이 끊어졌습니다.');
+        console.log(socket.id, '접속 해제');
 
         MatchingService.handleDisconnect(socket);
       });
