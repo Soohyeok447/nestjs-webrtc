@@ -16,9 +16,14 @@ class SocketManager {
       // 소켓 status를 idle로 설정
       socket['status'] = 'idle';
 
-      // 소개매칭 시작
+      // 소개매칭 대기 시작
       socket.on('start_matching', async (userId) => {
         MatchingService.startMatching(socket, userId);
+      });
+
+      // 소개매칭 대기 취소
+      socket.on('cancel_matching', async (userId) => {
+        MatchingService.cancelMatching(socket, userId);
       });
 
       // 소개매칭 phase에서 Accept 또는 Decline 처리
