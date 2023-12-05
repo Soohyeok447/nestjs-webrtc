@@ -5,6 +5,7 @@ import { NotFoundImagesException } from './../exceptions/images/NotFoundImagesEx
 import { User } from './../models/userModel';
 import { Images } from './../models/imagesModel';
 import { Socket } from 'socket.io';
+import { SocketEvents } from '../constants';
 
 class MatchingService {
   // 소개매칭 대기 및 pending된 User Set
@@ -26,14 +27,14 @@ class MatchingService {
     );
 
     // socket의 status가 idle인지 확인
-    if (socket['status'] !== 'idle') {
-      socket.emit('not_idle');
+    if (socket.status !== 'idle') {
+      socket.emit(SocketEvents.NOT_IDLE);
 
       return;
     }
 
     //소켓의 status를 waiting으로 설정
-    socket['status'] = 'waiting';
+    socket.status = 'waiting';
 
     try {
       // 매칭을 시작한 유저가 DB에 저장된 유저인지 확인
@@ -72,7 +73,7 @@ class MatchingService {
         // 본인은 제외하고 다른 waiting중인 partner들을 find
         if (
           partnerId !== currentUser.id &&
-          partnerSocket['status'] === 'waiting'
+          partnerSocket.status === 'waiting'
         ) {
           //TODO 실제 매칭 조건 추가 (gender, interests, purpose 등)
 
@@ -140,39 +141,39 @@ class MatchingService {
     };
 
     // 서로 파트너의 socket 저장
-    mySocket['partnerSocket'] = partnerSocket;
-    partnerSocket['partnerSocket'] = mySocket;
+    mySocket.partnerSocket = partnerSocket;
+    partnerSocket.partnerSocket = mySocket;
 
     //서로 파트너의 userId 저장
-    mySocket['partnerUserId'] = partner.id;
-    partnerSocket['partnerUserId'] = me.id;
+    mySocket.partnerUserId = partner.id;
+    partnerSocket.partnerUserId = me.id;
 
     //소켓의 status를 pending으로 변경
-    mySocket['status'] = 'pending';
-    partnerSocket['status'] = 'pending';
+    mySocket.status = 'pending';
+    partnerSocket.status = 'pending';
 
     console.log('매칭대기 성공했습니다. 서로 소개합니다. [서로 소개 이후]');
     console.log('waitingUsers.size', this.waitingUsers.size);
     console.log('pendingUsers.size', this.pendingUsers.size);
 
     // 클라이언트에게 상대방 정보를 전달 introduce_each_user 이벤트를 emit
-    mySocket.emit('introduce_each_user', userBInfo);
-    partnerSocket.emit('introduce_each_user', userAInfo);
+    mySocket.emit(SocketEvents.INTRODUCE_EACH_USER, userBInfo);
+    partnerSocket.emit(SocketEvents.INTRODUCE_EACH_USER, userAInfo);
 
     //TODO 타임아웃
     setTimeout(() => {
       if (
         mySocket.connected &&
         partnerSocket.connected &&
-        mySocket['status'] === 'pending' &&
-        partnerSocket['status'] === 'pending'
+        mySocket.status === 'pending' &&
+        partnerSocket.status === 'pending'
       ) {
         // response property 초기화
-        mySocket['response'] = null;
-        partnerSocket['response'] = null;
+        mySocket.response = null;
+        partnerSocket.response = null;
 
-        mySocket['status'] = 'idle';
-        partnerSocket['status'] = 'idle';
+        mySocket.status = 'idle';
+        partnerSocket.status = 'idle';
 
         //매칭이 안되었으므로 pending Set에 유저 2명 삭제
         this.pendingUsers.delete(me.id);
@@ -183,8 +184,8 @@ class MatchingService {
         partnerSocket.leave(roomName);
 
         //매칭 실패 result를 클라이언트로 emit
-        mySocket.emit('match_result', false);
-        partnerSocket.emit('match_result', false);
+        mySocket.emit(SocketEvents.MATCH_RESULT, false);
+        partnerSocket.emit(SocketEvents.MATCH_RESULT, false);
 
         console.log('timeOut으로 매칭 실패했습니다. [timeOut 이후 ]');
         console.log('waitingUsers.size', this.waitingUsers.size);
@@ -193,13 +194,13 @@ class MatchingService {
         //re matching
         if (mySocket.connected) {
           setTimeout(() => {
-            mySocket.emit('restart_matching_request');
+            mySocket.emit(SocketEvents.RESTART_MATCHING_REQUEST);
           }, 1000);
         }
 
         if (partnerSocket.connected) {
           setTimeout(() => {
-            partnerSocket.emit('restart_matching_request');
+            partnerSocket.emit(SocketEvents.RESTART_MATCHING_REQUEST);
           }, 3000);
         }
       }
@@ -217,36 +218,33 @@ class MatchingService {
     myResponse: string,
   ) {
     // 이미 매칭된 상태면 더 이상 accept와 decline이 불가능해야함
-    if (
-      mySocket['status'] === 'matched' &&
-      partnerSocket['status'] === 'matched'
-    ) {
+    if (mySocket.status === 'matched' && partnerSocket.status === 'matched') {
       return;
     }
 
     // 만약 클라이언트가 소개 매칭에서 accept를 선택했을 시
     if (myResponse === 'accept') {
       // socket response 속성을 accept로 설정
-      mySocket['response'] = 'accept';
+      mySocket.response = 'accept';
     } else {
       // 만약 클라이언트가 소개 매칭에서 decline을 선택했을 시
       // 바로 소개 매칭을 파토내야함
 
       // response property 초기화
-      mySocket['response'] = null;
-      partnerSocket['response'] = null;
+      mySocket.response = null;
+      partnerSocket.response = null;
 
       // 소켓의 status를 idle로 설정
-      mySocket['status'] = 'idle';
-      partnerSocket['status'] = 'idle';
+      mySocket.status = 'idle';
+      partnerSocket.status = 'idle';
 
       // 매칭이 안되었으니 pendingUsers Set에서 매칭된 유저 2명 제거
       this.pendingUsers.delete(myUserId);
       this.pendingUsers.delete(partnerUserId);
 
       // 클라이언트에게 match_result false로 emit
-      mySocket.emit('match_result', false);
-      partnerSocket.emit('match_result', false);
+      mySocket.emit(SocketEvents.MATCH_RESULT, false);
+      partnerSocket.emit(SocketEvents.MATCH_RESULT, false);
 
       console.log('decline되어서 매칭 실패했습니다. [매칭 declined 이후]');
       console.log('waitingUsers.size', this.waitingUsers.size);
@@ -255,33 +253,30 @@ class MatchingService {
       //re matching
       if (mySocket.connected) {
         setTimeout(() => {
-          mySocket.emit('restart_matching_request');
+          mySocket.emit(SocketEvents.RESTART_MATCHING_REQUEST);
         }, 1000);
       }
 
       if (partnerSocket.connected) {
         setTimeout(() => {
-          partnerSocket.emit('restart_matching_request');
+          partnerSocket.emit(SocketEvents.RESTART_MATCHING_REQUEST);
         }, 3000);
       }
     }
 
     // socket response 정보가 상호 accept일 때
-    if (
-      mySocket['response'] === 'accept' &&
-      partnerSocket['response'] === 'accept'
-    ) {
+    if (mySocket.response === 'accept' && partnerSocket.response === 'accept') {
       // response property 초기화
-      mySocket['response'] = null;
-      partnerSocket['response'] = null;
+      mySocket.response = null;
+      partnerSocket.response = null;
 
       // 소켓의 status를 matched로 설정
-      mySocket['status'] = 'matched';
-      partnerSocket['status'] = 'matched';
+      mySocket.status = 'matched';
+      partnerSocket.status = 'matched';
 
       // 클라이언트에게 matchResult true로 emit
-      mySocket.emit('match_result', true);
-      partnerSocket.emit('match_result', true);
+      mySocket.emit(SocketEvents.MATCH_RESULT, true);
+      partnerSocket.emit(SocketEvents.MATCH_RESULT, true);
 
       // 매칭이 되었으니 pendingUsers Set에서 나와 파트너를 제거
       this.pendingUsers.delete(myUserId);
@@ -318,18 +313,18 @@ class MatchingService {
     });
 
     // 만약 상대방과의 소개가 완료된 상태에서 disconnect 된 경우
-    if (socket['status'] === 'pending' || socket['status'] === 'matched') {
-      const partnerSocket = socket['partnerSocket'];
+    if (socket.status === 'pending' || socket.status === 'matched') {
+      const partnerSocket = socket.partnerSocket;
 
       // 상대방 소켓의 status를 idle로 변경
-      partnerSocket['status'] = 'idle';
+      partnerSocket.status = 'idle';
 
       // 상대방 response를 null로 변경
-      partnerSocket['response'] = null;
+      partnerSocket.response = null;
 
       // 상대에게 partner_disconnected 이벤트 전송 (다시 매칭 시도)
       if (partnerSocket.connected) {
-        partnerSocket.emit('partner_disconnected');
+        partnerSocket.emit(SocketEvents.PARTNER_DISCONNECTED);
       }
     }
   }
@@ -339,14 +334,14 @@ class MatchingService {
    */
   public async cancelMatching(socket: Socket, userId: string) {
     // socket의 status가 waiting인지 확인
-    if (socket['status'] !== 'waiting') {
-      socket.emit('not_waiting');
+    if (socket.status !== 'waiting') {
+      socket.emit(SocketEvents.NOT_WAITING);
 
       return;
     }
 
     //소켓의 status를 idle로 설정
-    socket['status'] = 'idle';
+    socket.status = 'idle';
 
     this.waitingUsers.delete(userId);
 
