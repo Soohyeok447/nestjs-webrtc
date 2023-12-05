@@ -7,5 +7,6 @@ declare module 'socket.io' {
     response?: 'accept' | null;
     partnerSocket?: Socket;
     partnerUserId?: string;
+    timeOut?: NodeJS.Timeout | null;
   }
 }

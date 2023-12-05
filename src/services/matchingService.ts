@@ -5,7 +5,9 @@ import { NotFoundImagesException } from './../exceptions/images/NotFoundImagesEx
 import { User } from './../models/userModel';
 import { Images } from './../models/imagesModel';
 import { Socket } from 'socket.io';
-import { SocketEvents } from '../constants';
+import { MatchEvents } from '../constants';
+
+const TIMEOUT_DURATION = 10 * 1000;
 
 class MatchingService {
   // 소개매칭 대기 및 pending된 User Set
@@ -20,7 +22,13 @@ class MatchingService {
   /**
    * 소개매칭 대기 시작
    */
-  public async startMatching(socket: Socket, userId: string) {
+  public async startMatching({
+    socket,
+    userId,
+  }: {
+    socket: Socket;
+    userId: string;
+  }) {
     console.log(
       'startMatching 발생. waitingUsers.size',
       this.waitingUsers.size,
@@ -28,13 +36,13 @@ class MatchingService {
 
     // socket의 status가 idle인지 확인
     if (socket.status !== 'idle') {
-      socket.emit(SocketEvents.NOT_IDLE);
+      socket.emit(MatchEvents.NOT_IDLE);
 
       return;
     }
 
     //소켓의 status를 waiting으로 설정
-    socket.status = 'waiting';
+    this.setSocketStatusToWaiting(socket);
 
     try {
       // 매칭을 시작한 유저가 DB에 저장된 유저인지 확인
@@ -51,12 +59,12 @@ class MatchingService {
         this.waitingUsers.set(userId, socket);
       } else {
         // 파트너를 찾으면 서로 소개 매칭을 잡음
-        await this.introduceEachUsers(
-          socket,
-          partner.socket,
-          currentUser,
-          partner.user,
-        );
+        await this.introduceUsers({
+          mySocket: socket,
+          partnerSocket: partner.socket,
+          me: currentUser,
+          partner: partner.user,
+        });
       }
     } catch (error) {
       console.log(error);
@@ -95,12 +103,21 @@ class MatchingService {
   /**
    * 유저들을 서로 소개
    */
-  private async introduceEachUsers(
-    mySocket: Socket,
-    partnerSocket: Socket,
-    me: User,
-    partner: User,
-  ) {
+  private async introduceUsers({
+    mySocket,
+    partnerSocket,
+    me,
+    partner,
+  }: {
+    mySocket: Socket;
+    partnerSocket: Socket;
+    me: User;
+    partner: User;
+  }) {
+    // 기존 setTimeOut 타이머 취소
+    this.clearTimeoutIfExists(mySocket);
+    this.clearTimeoutIfExists(partnerSocket);
+
     const userAImages: Images = await ImagesRepository.findByUserId(me.id);
     const userBImages: Images = await ImagesRepository.findByUserId(partner.id);
 
@@ -119,26 +136,12 @@ class MatchingService {
     this.pendingUsers.set(me.id, mySocket);
     this.pendingUsers.set(partner.id, partnerSocket);
 
-    // information for introducing each other
-    const userAInfo = {
-      id: me.id,
-      gender: me.gender,
-      interests: me.interests,
-      purpose: me.purpose,
-      nickname: me.nickname,
-      location: me.location,
-      profileUrl: userAImages.urls[0],
-    };
-
-    const userBInfo = {
-      id: partner.id,
-      gender: partner.gender,
-      interests: partner.interests,
-      purpose: partner.purpose,
-      nickname: partner.nickname,
-      location: partner.location,
-      profileUrl: userBImages.urls[0],
-    };
+    // 서로 소개하기 위한 정보 매핑
+    const userAInfo = this.mapUserInfo({ user: me, images: userAImages });
+    const userBInfo = this.mapUserInfo({
+      user: partner,
+      images: userBImages,
+    });
 
     // 서로 파트너의 socket 저장
     mySocket.partnerSocket = partnerSocket;
@@ -149,74 +152,136 @@ class MatchingService {
     partnerSocket.partnerUserId = me.id;
 
     //소켓의 status를 pending으로 변경
-    mySocket.status = 'pending';
-    partnerSocket.status = 'pending';
+    this.setSocketStatusToPending(mySocket);
+    this.setSocketStatusToPending(partnerSocket);
 
     console.log('매칭대기 성공했습니다. 서로 소개합니다. [서로 소개 이후]');
     console.log('waitingUsers.size', this.waitingUsers.size);
     console.log('pendingUsers.size', this.pendingUsers.size);
 
     // 클라이언트에게 상대방 정보를 전달 introduce_each_user 이벤트를 emit
-    mySocket.emit(SocketEvents.INTRODUCE_EACH_USER, userBInfo);
-    partnerSocket.emit(SocketEvents.INTRODUCE_EACH_USER, userAInfo);
+    mySocket.emit(MatchEvents.INTRODUCE_EACH_USER, userBInfo);
+    partnerSocket.emit(MatchEvents.INTRODUCE_EACH_USER, userAInfo);
 
-    //TODO 타임아웃
-    setTimeout(() => {
-      if (
-        mySocket.connected &&
-        partnerSocket.connected &&
-        mySocket.status === 'pending' &&
-        partnerSocket.status === 'pending'
-      ) {
-        // response property 초기화
-        mySocket.response = null;
-        partnerSocket.response = null;
+    // 타임아웃
+    mySocket.timeOut = partnerSocket.timeOut = setTimeout(
+      () =>
+        this.handleMatchingTimeout({
+          mySocket,
+          partnerSocket,
+          me,
+          partner,
+          roomName,
+        }),
+      TIMEOUT_DURATION,
+    );
+  }
 
-        mySocket.status = 'idle';
-        partnerSocket.status = 'idle';
+  /**
+   * 소켓의 status를 변경
+   */
+  private setSocketStatusToWaiting(socket: Socket) {
+    socket.status = 'waiting';
+  }
 
-        //매칭이 안되었으므로 pending Set에 유저 2명 삭제
-        this.pendingUsers.delete(me.id);
-        this.pendingUsers.delete(partner.id);
+  private setSocketStatusToPending(socket: Socket) {
+    socket.status = 'pending';
+  }
 
-        //매칭이 안되었으므로 room에서 leave함
-        mySocket.leave(roomName);
-        partnerSocket.leave(roomName);
+  private setSocketStatusToMatched(socket: Socket) {
+    socket.status = 'matched';
+  }
 
-        //매칭 실패 result를 클라이언트로 emit
-        mySocket.emit(SocketEvents.MATCH_RESULT, false);
-        partnerSocket.emit(SocketEvents.MATCH_RESULT, false);
+  private setSocketStatusToIdle(socket: Socket) {
+    socket.status = 'idle';
+  }
 
-        console.log('timeOut으로 매칭 실패했습니다. [timeOut 이후 ]');
-        console.log('waitingUsers.size', this.waitingUsers.size);
-        console.log('pendingUsers.size', this.pendingUsers.size);
+  /**
+   * 소개매칭 타임아웃 핸들러
+   */
+  private handleMatchingTimeout({
+    mySocket,
+    partnerSocket,
+    me,
+    partner,
+    roomName,
+  }): void {
+    if (
+      mySocket.connected &&
+      partnerSocket.connected &&
+      mySocket.status === 'pending' &&
+      partnerSocket.status === 'pending'
+    ) {
+      // response property 초기화
+      mySocket.response = null;
+      partnerSocket.response = null;
 
-        //re matching
-        if (mySocket.connected) {
-          setTimeout(() => {
-            mySocket.emit(SocketEvents.RESTART_MATCHING_REQUEST);
-          }, 1000);
-        }
+      // 소켓 status를 idle로 설정
+      this.setSocketStatusToIdle(mySocket);
+      this.setSocketStatusToIdle(partnerSocket);
 
-        if (partnerSocket.connected) {
-          setTimeout(() => {
-            partnerSocket.emit(SocketEvents.RESTART_MATCHING_REQUEST);
-          }, 3000);
-        }
+      //매칭이 안되었으므로 pending Set에 유저 2명 삭제
+      this.pendingUsers.delete(me.id);
+      this.pendingUsers.delete(partner.id);
+
+      //매칭이 안되었으므로 room에서 leave함
+      mySocket.leave(roomName);
+      partnerSocket.leave(roomName);
+
+      //매칭 실패 result를 클라이언트로 emit
+      mySocket.emit(MatchEvents.MATCH_RESULT, false);
+      partnerSocket.emit(MatchEvents.MATCH_RESULT, false);
+
+      console.log('timeOut으로 매칭 실패했습니다. [timeOut 이후]');
+      console.log('waitingUsers.size', this.waitingUsers.size);
+      console.log('pendingUsers.size', this.pendingUsers.size);
+
+      //re matching
+      if (mySocket.connected) {
+        setTimeout(() => {
+          mySocket.emit(MatchEvents.RESTART_MATCHING_REQUEST);
+        }, 1000);
       }
-    }, 10000);
+
+      if (partnerSocket.connected) {
+        setTimeout(() => {
+          partnerSocket.emit(MatchEvents.RESTART_MATCHING_REQUEST);
+        }, 3000);
+      }
+    }
+  }
+
+  /**
+   * 소개매칭을 위한 유저데이터 매핑
+   */
+  private mapUserInfo({ user, images }: { user: User; images: Images }) {
+    return {
+      id: user.id,
+      gender: user.gender,
+      interests: user.interests,
+      purpose: user.purpose,
+      nickname: user.nickname,
+      location: user.location,
+      profileUrl: images.urls[0],
+    };
   }
 
   /**
    * 소개 매칭에서의 Accept 또는 Decline 처리
    */
-  public handleUserResponse(
-    mySocket: Socket,
-    partnerSocket: Socket,
-    myUserId: string,
-    partnerUserId: string,
-    myResponse: string,
-  ) {
+  public handleUserResponse({
+    mySocket,
+    partnerSocket,
+    myUserId,
+    partnerUserId,
+    myResponse,
+  }: {
+    mySocket: Socket;
+    partnerSocket: Socket;
+    myUserId: string;
+    partnerUserId: string;
+    myResponse: string;
+  }) {
     // 이미 매칭된 상태면 더 이상 accept와 decline이 불가능해야함
     if (mySocket.status === 'matched' && partnerSocket.status === 'matched') {
       return;
@@ -230,21 +295,21 @@ class MatchingService {
       // 만약 클라이언트가 소개 매칭에서 decline을 선택했을 시
       // 바로 소개 매칭을 파토내야함
 
-      // response property 초기화
+      // status property를 idle로 설정
+      this.setSocketStatusToIdle(mySocket);
+      this.setSocketStatusToIdle(partnerSocket);
+
+      // response 초기화
       mySocket.response = null;
       partnerSocket.response = null;
-
-      // 소켓의 status를 idle로 설정
-      mySocket.status = 'idle';
-      partnerSocket.status = 'idle';
 
       // 매칭이 안되었으니 pendingUsers Set에서 매칭된 유저 2명 제거
       this.pendingUsers.delete(myUserId);
       this.pendingUsers.delete(partnerUserId);
 
       // 클라이언트에게 match_result false로 emit
-      mySocket.emit(SocketEvents.MATCH_RESULT, false);
-      partnerSocket.emit(SocketEvents.MATCH_RESULT, false);
+      mySocket.emit(MatchEvents.MATCH_RESULT, false);
+      partnerSocket.emit(MatchEvents.MATCH_RESULT, false);
 
       console.log('decline되어서 매칭 실패했습니다. [매칭 declined 이후]');
       console.log('waitingUsers.size', this.waitingUsers.size);
@@ -253,13 +318,13 @@ class MatchingService {
       //re matching
       if (mySocket.connected) {
         setTimeout(() => {
-          mySocket.emit(SocketEvents.RESTART_MATCHING_REQUEST);
+          mySocket.emit(MatchEvents.RESTART_MATCHING_REQUEST);
         }, 1000);
       }
 
       if (partnerSocket.connected) {
         setTimeout(() => {
-          partnerSocket.emit(SocketEvents.RESTART_MATCHING_REQUEST);
+          partnerSocket.emit(MatchEvents.RESTART_MATCHING_REQUEST);
         }, 3000);
       }
     }
@@ -271,12 +336,12 @@ class MatchingService {
       partnerSocket.response = null;
 
       // 소켓의 status를 matched로 설정
-      mySocket.status = 'matched';
-      partnerSocket.status = 'matched';
+      this.setSocketStatusToMatched(mySocket);
+      this.setSocketStatusToMatched(partnerSocket);
 
       // 클라이언트에게 matchResult true로 emit
-      mySocket.emit(SocketEvents.MATCH_RESULT, true);
-      partnerSocket.emit(SocketEvents.MATCH_RESULT, true);
+      mySocket.emit(MatchEvents.MATCH_RESULT, true);
+      partnerSocket.emit(MatchEvents.MATCH_RESULT, true);
 
       // 매칭이 되었으니 pendingUsers Set에서 나와 파트너를 제거
       this.pendingUsers.delete(myUserId);
@@ -317,14 +382,14 @@ class MatchingService {
       const partnerSocket = socket.partnerSocket;
 
       // 상대방 소켓의 status를 idle로 변경
-      partnerSocket.status = 'idle';
+      this.setSocketStatusToIdle(partnerSocket);
 
       // 상대방 response를 null로 변경
       partnerSocket.response = null;
 
       // 상대에게 partner_disconnected 이벤트 전송 (다시 매칭 시도)
       if (partnerSocket.connected) {
-        partnerSocket.emit(SocketEvents.PARTNER_DISCONNECTED);
+        partnerSocket.emit(MatchEvents.PARTNER_DISCONNECTED);
       }
     }
   }
@@ -332,16 +397,22 @@ class MatchingService {
   /**
    * 소개매칭 대기를 취소 함
    */
-  public async cancelMatching(socket: Socket, userId: string) {
+  public async cancelMatching({
+    socket,
+    userId,
+  }: {
+    socket: Socket;
+    userId: string;
+  }) {
     // socket의 status가 waiting인지 확인
     if (socket.status !== 'waiting') {
-      socket.emit(SocketEvents.NOT_WAITING);
+      socket.emit(MatchEvents.NOT_WAITING);
 
       return;
     }
 
     //소켓의 status를 idle로 설정
-    socket.status = 'idle';
+    this.setSocketStatusToIdle(socket);
 
     this.waitingUsers.delete(userId);
 
@@ -349,6 +420,30 @@ class MatchingService {
       'cancelMatching 발생. waitingUsers.size',
       this.waitingUsers.size,
     );
+  }
+
+  /**
+   * 타임아웃 설정
+   */
+  private setTimeOutWithClear(
+    socket: Socket,
+    milliseconds: number,
+    cb: () => void,
+  ) {
+    this.clearTimeoutIfExists(socket);
+
+    socket.timeOut = setTimeout(cb, milliseconds);
+  }
+
+  /**
+   * 설정된 타임아웃이 있으면 취소
+   */
+  private clearTimeoutIfExists(socket: Socket) {
+    if (socket.timeOut) {
+      clearTimeout(socket.timeOut);
+
+      socket.timeOut = null;
+    }
   }
 }
 
