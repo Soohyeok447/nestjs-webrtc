@@ -1,11 +1,15 @@
 import { Server, Socket } from 'socket.io';
 import MatchingService from './matchingService';
-import { MatchEvents } from '../constants';
+import { MatchEvents, WebRTCEvents } from '../constants';
 import {
-  CancelMatching,
-  RespondToIntroduce,
-  StartMatching,
+  AnswerEvent,
+  CancelMatchingEvent,
+  IceEvent,
+  OfferEvent,
+  RespondToIntroduceEvent,
+  StartMatchingEvent,
 } from '../types/eventParameters';
+import WebRTCService from './webrtcService';
 
 class SocketManager {
   private io: Server;
@@ -35,14 +39,17 @@ class SocketManager {
     socket.status = 'idle';
 
     // 소개매칭 대기 시작
-    socket.on(MatchEvents.START_MATCHING, async ({ userId }: StartMatching) => {
-      MatchingService.startMatching({ socket, userId });
-    });
+    socket.on(
+      MatchEvents.START_MATCHING,
+      async ({ userId }: StartMatchingEvent) => {
+        MatchingService.startMatching({ socket, userId });
+      },
+    );
 
     // 소개매칭 대기 취소
     socket.on(
       MatchEvents.CANCEL_MATCHING,
-      async ({ userId }: CancelMatching) => {
+      async ({ userId }: CancelMatchingEvent) => {
         MatchingService.cancelMatching({ socket, userId });
       },
     );
@@ -50,7 +57,7 @@ class SocketManager {
     // 소개매칭 phase에서 Accept 또는 Decline 처리
     socket.on(
       MatchEvents.RESPOND_TO_INTRODUCE,
-      ({ userId: myUserId, response: myResponse }: RespondToIntroduce) => {
+      ({ userId: myUserId, response: myResponse }: RespondToIntroduceEvent) => {
         const partnerUserId = socket.partnerUserId;
         const partnerSocket = socket.partnerSocket;
 
@@ -74,37 +81,25 @@ class SocketManager {
   }
 
   private setupWebRTCListener(socket: Socket) {
-    // 클라이언트가 offer 이벤트를 보낼 때
-    socket.on('offer', (data) => {
-      const partnerSocket = socket.partnerSocket;
-
-      // partnerSocket에게 offer 이벤트 전송
-      partnerSocket.emit('offer', {
-        offer: data.offer,
-        socketId: socket.id,
+    socket.on(WebRTCEvents.START_WEBRTC_SIGNALING, () => {
+      socket.to(socket.room).emit(WebRTCEvents.START_WEBRTC_SIGNALING, {
+        roomName: socket.room,
       });
     });
 
-    // 클라이언트가 answer 이벤트를 보낼 때
-    socket.on('answer', (data) => {
-      const partnerSocket = socket.partnerSocket;
-
-      // partnerSocket에게 answer 이벤트 전송
-      partnerSocket.emit('answer', {
-        answer: data.answer,
-        socketId: socket.id,
-      });
+    // 클라이언트가 offer 이벤트를 보낼 때 offer받고 파트너에게 전송
+    socket.on(WebRTCEvents.OFFER, ({ offer, roomName }: OfferEvent) => {
+      WebRTCService.handleOffer({ socket, offer, roomName });
     });
 
-    // 클라이언트가 ice-candidate 이벤트를 보낼 때
-    socket.on('ice-candidate', (data) => {
-      const partnerSocket = socket.partnerSocket;
+    // 클라이언트가 answer 이벤트를 보낼 때 answer받고 파트너에게 전송
+    socket.on(WebRTCEvents.ANSWER, ({ answer, roomName }: AnswerEvent) => {
+      WebRTCService.handleAnswer({ socket, answer, roomName });
+    });
 
-      // partnerSocket에게 ice-candidate 이벤트 전송
-      partnerSocket.emit('ice-candidate', {
-        candidate: data.candidate,
-        socketId: socket.id,
-      });
+    // 클라이언트가 ice-candidate 이벤트를 보낼 때 ice data받고 파트너에게 전송
+    socket.on(WebRTCEvents.ICE, ({ ice, roomName }: IceEvent) => {
+      WebRTCService.handleIce({ socket, ice, roomName });
     });
   }
 }

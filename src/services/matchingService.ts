@@ -123,11 +123,6 @@ class MatchingService {
 
     if (!userAImages || !userBImages) throw new NotFoundImagesException();
 
-    //TODO 추후 room정보와 userA, userB의 id 저장 (web RTC 및 logging)
-    const roomName = `room-${me.id}-${partner.id}`;
-    mySocket.join(roomName);
-    partnerSocket.join(roomName);
-
     // 소개 매칭이 되었으므로 waitingUsers Set에 나와 파트너를 제거
     this.waitingUsers.delete(me.id);
     this.waitingUsers.delete(partner.id);
@@ -171,29 +166,9 @@ class MatchingService {
           partnerSocket,
           me,
           partner,
-          roomName,
         }),
       TIMEOUT_DURATION,
     );
-  }
-
-  /**
-   * 소켓의 status를 변경
-   */
-  private setSocketStatusToWaiting(socket: Socket) {
-    socket.status = 'waiting';
-  }
-
-  private setSocketStatusToPending(socket: Socket) {
-    socket.status = 'pending';
-  }
-
-  private setSocketStatusToMatched(socket: Socket) {
-    socket.status = 'matched';
-  }
-
-  private setSocketStatusToIdle(socket: Socket) {
-    socket.status = 'idle';
   }
 
   /**
@@ -204,7 +179,6 @@ class MatchingService {
     partnerSocket,
     me,
     partner,
-    roomName,
   }): void {
     if (
       mySocket.connected &&
@@ -224,13 +198,9 @@ class MatchingService {
       this.pendingUsers.delete(me.id);
       this.pendingUsers.delete(partner.id);
 
-      //매칭이 안되었으므로 room에서 leave함
-      mySocket.leave(roomName);
-      partnerSocket.leave(roomName);
-
       //매칭 실패 result를 클라이언트로 emit
-      mySocket.emit(MatchEvents.MATCH_RESULT, false);
-      partnerSocket.emit(MatchEvents.MATCH_RESULT, false);
+      mySocket.emit(MatchEvents.MATCH_RESULT, { result: false });
+      partnerSocket.emit(MatchEvents.MATCH_RESULT, { result: false });
 
       console.log('timeOut으로 매칭 실패했습니다. [timeOut 이후]');
       console.log('waitingUsers.size', this.waitingUsers.size);
@@ -308,8 +278,8 @@ class MatchingService {
       this.pendingUsers.delete(partnerUserId);
 
       // 클라이언트에게 match_result false로 emit
-      mySocket.emit(MatchEvents.MATCH_RESULT, false);
-      partnerSocket.emit(MatchEvents.MATCH_RESULT, false);
+      mySocket.emit(MatchEvents.MATCH_RESULT, { result: false });
+      partnerSocket.emit(MatchEvents.MATCH_RESULT, { result: false });
 
       console.log('decline되어서 매칭 실패했습니다. [매칭 declined 이후]');
       console.log('waitingUsers.size', this.waitingUsers.size);
@@ -329,7 +299,7 @@ class MatchingService {
       }
     }
 
-    // socket response 정보가 상호 accept일 때
+    // socket response 정보가 상호 accept일 때 (매칭이 성사됐을 때)
     if (mySocket.response === 'accept' && partnerSocket.response === 'accept') {
       // response property 초기화
       mySocket.response = null;
@@ -339,9 +309,21 @@ class MatchingService {
       this.setSocketStatusToMatched(mySocket);
       this.setSocketStatusToMatched(partnerSocket);
 
-      // 클라이언트에게 matchResult true로 emit
-      mySocket.emit(MatchEvents.MATCH_RESULT, true);
-      partnerSocket.emit(MatchEvents.MATCH_RESULT, true);
+      //TODO 추후 room정보와 userA, userB의 id 저장 (web RTC 및 logging)
+      const roomName = `room-${mySocket.id}-${partnerSocket.id}`;
+      mySocket.join(roomName);
+      partnerSocket.join(roomName);
+
+      mySocket.room = roomName;
+      partnerSocket.room = roomName;
+
+      // 클라이언트에게 matchResult true로 emit,
+      // 그리고 2명중 1명에게 webRTC signaling을 시작하도록 함
+      mySocket.emit(MatchEvents.MATCH_RESULT, {
+        result: true,
+        initiator: true,
+      });
+      partnerSocket.emit(MatchEvents.MATCH_RESULT, { result: true });
 
       // 매칭이 되었으니 pendingUsers Set에서 나와 파트너를 제거
       this.pendingUsers.delete(myUserId);
@@ -359,6 +341,9 @@ class MatchingService {
    * Disconnect 처리
    */
   public handleDisconnect(socket: Socket) {
+    //room에 join한 상태면 room에서 leave함
+    if (socket.room) socket.leave(socket.room);
+
     // waitingUsers Set에서 삭제
     this.waitingUsers.forEach((userSocket, userId) => {
       if (userSocket === socket) {
@@ -444,6 +429,25 @@ class MatchingService {
 
       socket.timeOut = null;
     }
+  }
+
+  /**
+   * 소켓의 status를 변경
+   */
+  private setSocketStatusToWaiting(socket: Socket) {
+    socket.status = 'waiting';
+  }
+
+  private setSocketStatusToPending(socket: Socket) {
+    socket.status = 'pending';
+  }
+
+  private setSocketStatusToMatched(socket: Socket) {
+    socket.status = 'matched';
+  }
+
+  private setSocketStatusToIdle(socket: Socket) {
+    socket.status = 'idle';
   }
 }
 
