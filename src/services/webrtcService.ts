@@ -1,4 +1,12 @@
+import { WebRTCEvents } from '../constants';
+
 class WebRTCService {
+  public handleSignalingStarter({ socket }) {
+    socket.to(socket.room).emit(WebRTCEvents.START_WEBRTC_SIGNALING, {
+      roomName: socket.room,
+    });
+  }
+
   public handleOffer({ socket, offer, roomName }) {
     socket.to(roomName).emit('offer', { offer, roomName });
   }
