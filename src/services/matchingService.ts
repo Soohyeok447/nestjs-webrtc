@@ -369,8 +369,17 @@ class MatchingService {
       // 상대방 소켓의 status를 idle로 변경
       this.setSocketStatusToIdle(partnerSocket);
 
-      // 상대방 response를 null로 변경
-      partnerSocket.response = null;
+      // 상대방 timeout을 null로 변경
+      partnerSocket.timeOut = null;
+
+      // 상대방 room을 null로 변경
+      partnerSocket.room = null;
+
+      // 상대방 partnerUserId를 null로 변경
+      partnerSocket.partnerUserId = null;
+
+      // 상대방 partnerSocket을 null로 변경
+      partnerSocket.partnerSocket = null;
 
       // 상대에게 partner_disconnected 이벤트 전송 (다시 매칭 시도)
       if (partnerSocket.connected) {
