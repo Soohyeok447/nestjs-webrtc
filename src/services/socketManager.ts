@@ -81,10 +81,9 @@ class SocketManager {
   }
 
   private setupWebRTCListener(socket: Socket) {
+    // 매칭성사 이후 webrtc signaling을 시작하는 이벤트 (2명 중 1명이 emit함)
     socket.on(WebRTCEvents.START_WEBRTC_SIGNALING, () => {
-      socket.to(socket.room).emit(WebRTCEvents.START_WEBRTC_SIGNALING, {
-        roomName: socket.room,
-      });
+      WebRTCService.handleSignalingStarter({ socket });
     });
 
     // 클라이언트가 offer 이벤트를 보낼 때 offer받고 파트너에게 전송

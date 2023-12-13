@@ -12,19 +12,16 @@ export type CancelMatchingEvent = {
 };
 
 export type OfferEvent = {
-  // offer: RTCSessionDescriptionInit;
-  offer: any;
+  offer: RTCSessionDescriptionInit;
   roomName: string;
 };
 
 export type AnswerEvent = {
-  // answer: RTCSessionDescriptionInit;
-  answer: any;
+  answer: RTCSessionDescriptionInit;
   roomName: string;
 };
 
 export type IceEvent = {
-  // ice: RTCIceCandidate;
-  ice: any;
+  ice: RTCIceCandidate;
   roomName: string;
 };
