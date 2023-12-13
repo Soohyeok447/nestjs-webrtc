@@ -17,11 +17,12 @@ export const options = {
       - authentication with JWT
       - User CRU
       - Images CRU
+      - 유저매칭 및 webrtc signaling
       
       [Upcoming features]
-      - 유저매칭 및 태그 기반 알고리즘
-      - 소켓 설정
-      - webRTC
+      - 매칭 로깅
+      - 화상채팅 도중 발생 이벤트(5분유지, 얼굴공개 수락, 신고)
+      - 화상채팅 이후 발생 이벤트(쪽지)
 
       [패치 노트]
       -231120-
@@ -41,15 +42,14 @@ export const options = {
       /auth/onboard request body 수정:
       socketId: String 필드가 추가됨
 
-      아직은 소켓 서버 구현중.
-      현재 onboard 테스트를 위해서는 socketId에 아무 string이나 넣으면 됨. (socketId 필드가 비어있으면 400 exception)
-
-      추후 socket 서버가 구현이 되면 socket에 생성된 socketId를 파라미터에 넣고 onboard하면 됨.
-
 
       -231123-
       /auth/onboard request body에 socketId삭제:
       socketId: String 필드가 삭제됨
+
+
+      -231212-
+      매칭, webrtc 서버 개발 완료
       
       `,
     },
