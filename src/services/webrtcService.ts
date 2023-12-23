@@ -7,16 +7,16 @@ class WebRTCService {
     });
   }
 
-  public handleOffer({ socket, offer, roomName }) {
-    socket.to(roomName).emit(WebRTCEvents.OFFER, { offer, roomName });
+  public handleOffer({ socket, offer }) {
+    socket.to(socket.room).emit(WebRTCEvents.OFFER, { offer });
   }
 
-  public handleAnswer({ socket, answer, roomName }) {
-    socket.to(roomName).emit(WebRTCEvents.ANSWER, { answer });
+  public handleAnswer({ socket, answer }) {
+    socket.to(socket.room).emit(WebRTCEvents.ANSWER, { answer });
   }
 
-  public handleIce({ socket, ice, roomName }) {
-    socket.to(roomName).emit(WebRTCEvents.ICE, { ice });
+  public handleIce({ socket, ice }) {
+    socket.to(socket.room).emit(WebRTCEvents.ICE, { ice });
   }
 }
 

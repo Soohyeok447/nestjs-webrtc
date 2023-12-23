@@ -87,18 +87,18 @@ class SocketManager {
     });
 
     // 클라이언트가 offer 이벤트를 보낼 때 offer받고 파트너에게 전송
-    socket.on(WebRTCEvents.OFFER, ({ offer, roomName }: OfferEvent) => {
-      WebRTCService.handleOffer({ socket, offer, roomName });
+    socket.on(WebRTCEvents.OFFER, ({ offer }: OfferEvent) => {
+      WebRTCService.handleOffer({ socket, offer });
     });
 
     // 클라이언트가 answer 이벤트를 보낼 때 answer받고 파트너에게 전송
-    socket.on(WebRTCEvents.ANSWER, ({ answer, roomName }: AnswerEvent) => {
-      WebRTCService.handleAnswer({ socket, answer, roomName });
+    socket.on(WebRTCEvents.ANSWER, ({ answer }: AnswerEvent) => {
+      WebRTCService.handleAnswer({ socket, answer });
     });
 
     // 클라이언트가 ice-candidate 이벤트를 보낼 때 ice data받고 파트너에게 전송
-    socket.on(WebRTCEvents.ICE, ({ ice, roomName }: IceEvent) => {
-      WebRTCService.handleIce({ socket, ice, roomName });
+    socket.on(WebRTCEvents.ICE, ({ ice }: IceEvent) => {
+      WebRTCService.handleIce({ socket, ice });
     });
   }
 }
