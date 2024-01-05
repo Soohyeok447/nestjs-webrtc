@@ -6,6 +6,7 @@ import { User } from './../models/userModel';
 import { Images } from './../models/imagesModel';
 import { Socket } from 'socket.io';
 import { MatchEvents } from '../constants';
+import MatchLogService from './matchLogService';
 
 const TIMEOUT_DURATION = 10 * 1000;
 
@@ -158,6 +159,11 @@ class MatchingService {
     mySocket.emit(MatchEvents.INTRODUCE_EACH_USER, userBInfo);
     partnerSocket.emit(MatchEvents.INTRODUCE_EACH_USER, userAInfo);
 
+    // 매치 로그 생성
+    MatchLogService.createPendingMatchLog({
+      userIds: [me.id, partner.id],
+    });
+
     // 타임아웃
     mySocket.timeOut = partnerSocket.timeOut = setTimeout(
       () =>
@@ -201,6 +207,11 @@ class MatchingService {
       //매칭 실패 result를 클라이언트로 emit
       mySocket.emit(MatchEvents.MATCH_RESULT, { result: false });
       partnerSocket.emit(MatchEvents.MATCH_RESULT, { result: false });
+
+      // 매치 로그 생성
+      MatchLogService.createExpiredMatchLog({
+        userIds: [me.id, partner.id],
+      });
 
       console.log('timeOut으로 매칭 실패했습니다. [timeOut 이후]');
       console.log('waitingUsers.size', this.waitingUsers.size);
@@ -281,6 +292,11 @@ class MatchingService {
       mySocket.emit(MatchEvents.MATCH_RESULT, { result: false });
       partnerSocket.emit(MatchEvents.MATCH_RESULT, { result: false });
 
+      // 매치 로그 생성
+      MatchLogService.createDeclinedMatchLog({
+        userIds: [myUserId, partnerUserId],
+      });
+
       console.log('decline되어서 매칭 실패했습니다. [매칭 declined 이후]');
       console.log('waitingUsers.size', this.waitingUsers.size);
       console.log('pendingUsers.size', this.pendingUsers.size);
@@ -324,6 +340,11 @@ class MatchingService {
         initiator: true,
       });
       partnerSocket.emit(MatchEvents.MATCH_RESULT, { result: true });
+
+      // 매치 로그 생성
+      MatchLogService.createMatchedMatchLog({
+        userIds: [myUserId, partnerUserId],
+      });
 
       // 매칭이 되었으니 pendingUsers Set에서 나와 파트너를 제거
       this.pendingUsers.delete(myUserId);
@@ -381,6 +402,11 @@ class MatchingService {
       // 상대방 partnerSocket을 null로 변경
       partnerSocket.partnerSocket = null;
 
+      // 매치 로그 생성
+      MatchLogService.createCanceledMatchLog({
+        userIds: [partnerSocket.partnerUserId, socket.partnerUserId],
+      });
+
       // 상대에게 partner_disconnected 이벤트 전송 (다시 매칭 시도)
       if (partnerSocket.connected) {
         partnerSocket.emit(MatchEvents.PARTNER_DISCONNECTED);
@@ -414,19 +440,6 @@ class MatchingService {
       'cancelMatching 발생. waitingUsers.size',
       this.waitingUsers.size,
     );
-  }
-
-  /**
-   * 타임아웃 설정
-   */
-  private setTimeOutWithClear(
-    socket: Socket,
-    milliseconds: number,
-    cb: () => void,
-  ) {
-    this.clearTimeoutIfExists(socket);
-
-    socket.timeOut = setTimeout(cb, milliseconds);
   }
 
   /**
