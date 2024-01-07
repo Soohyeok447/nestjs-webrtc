@@ -218,17 +218,7 @@ class MatchingService {
       console.log('pendingUsers.size', this.pendingUsers.size);
 
       //re matching
-      if (mySocket.connected) {
-        setTimeout(() => {
-          mySocket.emit(MatchEvents.RESTART_MATCHING_REQUEST);
-        }, 1000);
-      }
-
-      if (partnerSocket.connected) {
-        setTimeout(() => {
-          partnerSocket.emit(MatchEvents.RESTART_MATCHING_REQUEST);
-        }, 3000);
-      }
+      this.RequestReMatch(mySocket, partnerSocket);
     }
   }
 
@@ -302,17 +292,7 @@ class MatchingService {
       console.log('pendingUsers.size', this.pendingUsers.size);
 
       //re matching
-      if (mySocket.connected) {
-        setTimeout(() => {
-          mySocket.emit(MatchEvents.RESTART_MATCHING_REQUEST);
-        }, 1000);
-      }
-
-      if (partnerSocket.connected) {
-        setTimeout(() => {
-          partnerSocket.emit(MatchEvents.RESTART_MATCHING_REQUEST);
-        }, 3000);
-      }
+      this.RequestReMatch(mySocket, partnerSocket);
     }
 
     // socket response 정보가 상호 accept일 때 (매칭이 성사됐을 때)
@@ -390,6 +370,9 @@ class MatchingService {
       // 상대방 소켓의 status를 idle로 변경
       this.setSocketStatusToIdle(partnerSocket);
 
+      // timeOut객체 초기화
+      this.clearTimeoutIfExists(partnerSocket);
+
       // 상대방 timeout을 null로 변경
       partnerSocket.timeOut = null;
 
@@ -440,6 +423,110 @@ class MatchingService {
       'cancelMatching 발생. waitingUsers.size',
       this.waitingUsers.size,
     );
+  }
+
+  /**
+   * 화상채팅 도중 한 유저가 끊음
+   */
+  public async leaveWebchat({
+    socket: mySocket,
+    userId,
+  }: {
+    socket: Socket;
+    userId: string;
+  }) {
+    const partnerSocket = mySocket.partnerSocket;
+
+    // 화상채팅 종료이벤트 발생
+    mySocket.emit(MatchEvents.WEBCHAT_ENDED);
+    mySocket.partnerSocket.emit(MatchEvents.WEBCHAT_ENDED);
+
+    // 매치 로그 생성
+    MatchLogService.createCanceledMatchLog({
+      userIds: [userId, mySocket.partnerUserId],
+    });
+
+    // re match
+    this.RequestReMatch(mySocket, partnerSocket);
+
+    // reset function
+    const resetSocketProperty = (socket: Socket) => {
+      socket.partnerSocket = null;
+      socket.partnerUserId = null;
+      socket.room = null;
+      this.clearTimeoutIfExists(socket);
+      this.setSocketStatusToIdle(socket);
+    };
+
+    // 내 소켓, 파트너 소켓 속성 초기화
+    resetSocketProperty(mySocket);
+    resetSocketProperty(partnerSocket);
+  }
+
+  /**
+   * 화상채팅 도중 얼굴공개 요청을 받음
+   */
+  public async requestFaceRecognition({
+    socket,
+    userId,
+  }: {
+    socket: Socket;
+    userId: string;
+  }) {
+    const user = await UserRepository.findById(userId);
+
+    if (!user) return;
+
+    // x초 지나면 거시기 안되게
+    //const date = new Date();
+
+    const partnerSocket = socket.partnerSocket;
+
+    partnerSocket.emit(MatchEvents.REQUEST_FACE_RECOGNITION);
+  }
+
+  /**
+   * 화상채팅 도중 얼굴공개 요청을 받은 파트너가 응답을 함
+   */
+  public async respondFaceRecognition({
+    socket,
+    userId,
+    response,
+  }: {
+    socket: Socket;
+    userId: string;
+    response: 'accept' | 'decline';
+  }) {
+    const partnerSocket = socket.partnerSocket;
+
+    const user = await UserRepository.findById(userId);
+
+    if (!user) return;
+
+    if (response === 'decline') {
+      socket.emit(MatchEvents.FACE_RECOGNITION_REQUEST_DENIED);
+      partnerSocket.emit(MatchEvents.FACE_RECOGNITION_REQUEST_DENIED);
+    }
+
+    if (response === 'accept') {
+      socket.emit(MatchEvents.PERFORM_FACE_RECOGNITION);
+      partnerSocket.emit(MatchEvents.PERFORM_FACE_RECOGNITION);
+    }
+  }
+
+  // 재매칭 요청 함수
+  private RequestReMatch(mySocket: Socket, partnerSocket: Socket) {
+    if (mySocket.connected) {
+      setTimeout(() => {
+        mySocket.emit(MatchEvents.RESTART_MATCHING_REQUEST);
+      }, 1000);
+    }
+
+    if (partnerSocket.connected) {
+      setTimeout(() => {
+        partnerSocket.emit(MatchEvents.RESTART_MATCHING_REQUEST);
+      }, 3000);
+    }
   }
 
   /**

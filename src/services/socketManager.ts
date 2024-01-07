@@ -5,8 +5,11 @@ import {
   AnswerEvent,
   CancelMatchingEvent,
   IceEvent,
+  LeaveWebchatEvent,
   OfferEvent,
+  RequestFaceRecognition,
   RespondToIntroduceEvent,
+  RespondFaceRecognition,
   StartMatchingEvent,
 } from '../types/eventParameters';
 import WebRTCService from './webrtcService';
@@ -76,6 +79,30 @@ class SocketManager {
 
           socket.emit(MatchEvents.INVALID_RESPOND_TO_INTRODUCE);
         }
+      },
+    );
+
+    // 화상채팅 도중 끊음
+    socket.on(
+      MatchEvents.LEAVE_WEBCHAT,
+      async ({ userId }: LeaveWebchatEvent) => {
+        MatchingService.leaveWebchat({ socket, userId });
+      },
+    );
+
+    // 화상채팅 도중 얼굴공개 요청을 받음
+    socket.on(
+      MatchEvents.REQUEST_FACE_RECOGNITION,
+      async ({ userId }: RequestFaceRecognition) => {
+        MatchingService.requestFaceRecognition({ socket, userId });
+      },
+    );
+
+    // 화상채팅 도중 얼굴공개 요청을 받은 파트너가 응답을 함
+    socket.on(
+      MatchEvents.RESPOND_FACE_RECOGNITION,
+      async ({ userId, response }: RespondFaceRecognition) => {
+        MatchingService.respondFaceRecognition({ socket, userId, response });
       },
     );
   }
