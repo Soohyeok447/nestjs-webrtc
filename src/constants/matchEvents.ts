@@ -9,4 +9,10 @@ export enum MatchEvents {
   CANCEL_MATCHING = 'cancel_matching',
   RESPOND_TO_INTRODUCE = 'respond_to_introduce',
   INVALID_RESPOND_TO_INTRODUCE = 'invalid_respond_to_introduce',
+  LEAVE_WEBCHAT = 'leave_webchat',
+  WEBCHAT_ENDED = 'webchat_ended',
+  REQUEST_FACE_RECOGNITION = 'request_face_recognition',
+  RESPOND_FACE_RECOGNITION = 'respond_face_recognition',
+  PERFORM_FACE_RECOGNITION = 'perform_face_recognition',
+  FACE_RECOGNITION_REQUEST_DENIED = 'face_recognition_request_denied',
 }

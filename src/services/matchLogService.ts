@@ -16,7 +16,7 @@ class MatchLogService {
   }): Promise<void> {
     try {
       //id가 User DB에 있는지 확인 1명이라도 없으면 catch됨
-      await this._validateUserIds(userIds);
+      await this.validateUserIds(userIds);
 
       const id = UUIDService.generateUUID();
 
@@ -57,7 +57,7 @@ class MatchLogService {
     await this.createLog({ userIds, status: 'reported' });
   }
 
-  private async _validateUserIds(userIds: string[]) {
+  private async validateUserIds(userIds: string[]) {
     return await Promise.all(
       userIds.map(async (e) => {
         return await UserRepository.findById(e);
