@@ -142,7 +142,6 @@ const UserSchema: Schema = new Schema(
 
 export interface UserDocument extends Document {
   id: string;
-  socketId: string;
   refreshToken: string;
   gender: Gender;
   nickname: string;
