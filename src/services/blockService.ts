@@ -6,41 +6,9 @@ import { NotFoundBlockLogException } from '../exceptions/blockLog/NotFoundBlockL
 
 class BlockService {
   /**
-   * 유저 차단
+   * 유저 차단/차단해제 토글
    */
-  public async blockUser({
-    userId,
-    targetId,
-  }: {
-    userId: string;
-    targetId: string;
-  }): Promise<void> {
-    try {
-      const user = await UserRepository.findById(userId);
-      const target = await UserRepository.findById(targetId);
-
-      if (!user || !target) throw new NotFoundUserException();
-
-      const userBlockLog = await BlockRepository.findByUserId(userId);
-
-      if (!userBlockLog) {
-        // 유저 차단 로그가 생성돼있지 않다면 새로 생성
-        await BlockRepository.create({ userId, blockUserId: targetId });
-      } else {
-        // 유저 차단 로그가 생성돼있다면 수정
-        await BlockRepository.update({ userId, blockUserId: targetId });
-      }
-    } catch (err) {
-      console.log(err);
-
-      return;
-    }
-  }
-
-  /**
-   * 유저 차단해제
-   */
-  public async unBlockUser({
+  public async toggleBlock({
     userId,
     targetId,
   }: {
