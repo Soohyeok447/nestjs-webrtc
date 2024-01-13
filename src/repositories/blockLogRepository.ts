@@ -1,6 +1,6 @@
 import { BlockLog, BlockLogModel } from '../models/blockModel';
 
-class BlockRepository {
+class BlockLogRepository {
   public async create({ userId, blockUserId }): Promise<BlockLog> {
     const block = new BlockLogModel({ userId, blockUserIds: [blockUserId] });
 
@@ -41,4 +41,4 @@ class BlockRepository {
   }
 }
 
-export default new BlockRepository();
+export default new BlockLogRepository();

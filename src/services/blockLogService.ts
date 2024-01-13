@@ -1,10 +1,10 @@
 import { NotFoundUserException } from '../exceptions/users';
 import UserRepository from '../repositories/userRepository';
-import BlockRepository from '../repositories/blockRepository';
+import BlockLogRepository from '../repositories/blockLogRepository';
 import { BlockLog } from '../models/blockModel';
 import { NotFoundBlockLogException } from '../exceptions/blockLog/NotFoundBlockLogException';
 
-class BlockService {
+class BlockLogService {
   /**
    * 유저 차단/차단해제 토글
    */
@@ -21,14 +21,14 @@ class BlockService {
 
       if (!user || !target) throw new NotFoundUserException();
 
-      const userBlockLog = await BlockRepository.findByUserId(userId);
+      const userBlockLog = await BlockLogRepository.findByUserId(userId);
 
       if (!userBlockLog) {
         // 유저 차단 로그가 생성돼있지 않다면 새로 생성
-        await BlockRepository.create({ userId, blockUserId: targetId });
+        await BlockLogRepository.create({ userId, blockUserId: targetId });
       } else {
         // 유저 차단 로그가 생성돼있다면 수정
-        await BlockRepository.update({ userId, blockUserId: targetId });
+        await BlockLogRepository.update({ userId, blockUserId: targetId });
       }
     } catch (err) {
       console.log(err);
@@ -42,7 +42,7 @@ class BlockService {
    */
   public async findBlockLog({ userId }: { userId: string }): Promise<BlockLog> {
     try {
-      const userBlockLog = await BlockRepository.findByUserId(userId);
+      const userBlockLog = await BlockLogRepository.findByUserId(userId);
 
       if (!userBlockLog) throw new NotFoundBlockLogException();
 
@@ -55,4 +55,4 @@ class BlockService {
   }
 }
 
-export default new BlockService();
+export default new BlockLogService();
