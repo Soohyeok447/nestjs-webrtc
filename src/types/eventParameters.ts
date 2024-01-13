@@ -22,6 +22,7 @@ export type RequestFaceRecognition = {
 export type RespondFaceRecognition = {
   userId: string;
   response: 'accept' | 'decline';
+  receivedTime: Date | string;
 };
 
 export type OfferEvent = {

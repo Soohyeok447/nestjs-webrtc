@@ -9,6 +9,7 @@ import { MatchEvents } from '../constants';
 import MatchLogService from './matchLogService';
 
 const TIMEOUT_DURATION = 10 * 1000;
+const FACE_REQUEST_TIMEOUT = 1000 * 10;
 
 class MatchingService {
   // 소개매칭 대기 및 pending된 User Set
@@ -44,6 +45,9 @@ class MatchingService {
 
     //소켓의 status를 waiting으로 설정
     this.setSocketStatusToWaiting(socket);
+
+    //소켓의 faceRecognitionRequested(얼굴공개요청여부)을 false로 초기화
+    this.clearFaceRecognitionRequested(socket);
 
     try {
       // 매칭을 시작한 유저가 DB에 저장된 유저인지 확인
@@ -473,15 +477,26 @@ class MatchingService {
     socket: Socket;
     userId: string;
   }) {
+    const partnerSocket = socket.partnerSocket;
+
+    // 만약 얼굴공개 요청을 이미 받은 상태면
+    if (socket.faceRecognitionRequested) {
+      // 이미 얼굴공개 요청을 받음 이벤트 생성
+      socket.emit(MatchEvents.ALREADY_REQUESTED);
+      partnerSocket.emit(MatchEvents.ALREADY_REQUESTED);
+      return;
+    }
+
+    // 유저 유효성 검사
     const user = await UserRepository.findById(userId);
 
     if (!user) return;
 
-    // x초 지나면 거시기 안되게
-    //const date = new Date();
+    // 얼굴공개 요청을 했다고 해둠
+    socket.faceRecognitionRequested = true;
+    partnerSocket.faceRecognitionRequested = true;
 
-    const partnerSocket = socket.partnerSocket;
-
+    // 상대에게 얼굴공개요청을 보냄
     partnerSocket.emit(MatchEvents.REQUEST_FACE_RECOGNITION);
   }
 
@@ -492,23 +507,48 @@ class MatchingService {
     socket,
     userId,
     response,
+    receivedTime,
   }: {
     socket: Socket;
     userId: string;
     response: 'accept' | 'decline';
+    receivedTime: Date | string;
   }) {
     const partnerSocket = socket.partnerSocket;
 
+    const currentDate = new Date();
+
+    // receivedTime 유효성 검사
+    if (typeof receivedTime === 'string') {
+      receivedTime = new Date(receivedTime);
+    }
+
+    // 얼굴공개 요청 받은지 n초가 지나면
+    if (
+      currentDate.getTime() >=
+      receivedTime.getTime() + FACE_REQUEST_TIMEOUT
+    ) {
+      // 응답이 너무 늦었음 이벤트 발생
+      socket.emit(MatchEvents.RESPOND_IS_TOO_LATE);
+      partnerSocket.emit(MatchEvents.RESPOND_IS_TOO_LATE);
+      return;
+    }
+
+    // 유저 유효성 검사
     const user = await UserRepository.findById(userId);
 
     if (!user) return;
 
+    // 얼굴공개 요청이 거절일경우
     if (response === 'decline') {
+      // 얼굴공개가 거부됐다는 이벤트 발생
       socket.emit(MatchEvents.FACE_RECOGNITION_REQUEST_DENIED);
       partnerSocket.emit(MatchEvents.FACE_RECOGNITION_REQUEST_DENIED);
     }
 
+    // 얼굴공개 요청이 수락일경우
     if (response === 'accept') {
+      // 얼굴공개를 시작하라는 이벤트 발생
       socket.emit(MatchEvents.PERFORM_FACE_RECOGNITION);
       partnerSocket.emit(MatchEvents.PERFORM_FACE_RECOGNITION);
     }
@@ -516,12 +556,14 @@ class MatchingService {
 
   // 재매칭 요청 함수
   private RequestReMatch(mySocket: Socket, partnerSocket: Socket) {
+    // 내소켓이 연결돼있으면 1초뒤 매칭요청을 다시 보내라는 이벤트 발생
     if (mySocket.connected) {
       setTimeout(() => {
         mySocket.emit(MatchEvents.RESTART_MATCHING_REQUEST);
       }, 1000);
     }
 
+    // 상대방 소켓이 연결돼있으면 3초뒤 매칭요청을 다시 보내라는 이벤트 발생
     if (partnerSocket.connected) {
       setTimeout(() => {
         partnerSocket.emit(MatchEvents.RESTART_MATCHING_REQUEST);
@@ -557,6 +599,11 @@ class MatchingService {
 
   private setSocketStatusToIdle(socket: Socket) {
     socket.status = 'idle';
+  }
+
+  //얼굴공개요청여부 속성을 초기화
+  private clearFaceRecognitionRequested(socket: Socket) {
+    socket.faceRecognitionRequested = false;
   }
 }
 
