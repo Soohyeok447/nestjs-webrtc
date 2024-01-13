@@ -9,5 +9,6 @@ declare module 'socket.io' {
     partnerUserId?: string;
     room?: string;
     timeOut?: NodeJS.Timeout | null;
+    faceRecognitionRequested?: boolean;
   }
 }

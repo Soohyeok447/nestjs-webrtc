@@ -101,8 +101,13 @@ class SocketManager {
     // 화상채팅 도중 얼굴공개 요청을 받은 파트너가 응답을 함
     socket.on(
       MatchEvents.RESPOND_FACE_RECOGNITION,
-      async ({ userId, response }: RespondFaceRecognition) => {
-        MatchingService.respondFaceRecognition({ socket, userId, response });
+      async ({ userId, response, receivedTime }: RespondFaceRecognition) => {
+        MatchingService.respondFaceRecognition({
+          socket,
+          userId,
+          response,
+          receivedTime,
+        });
       },
     );
   }
