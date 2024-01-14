@@ -110,6 +110,8 @@ class SocketManager {
         });
       },
     );
+
+    //todo 차단기능
   }
 
   private setupWebRTCListener(socket: Socket) {

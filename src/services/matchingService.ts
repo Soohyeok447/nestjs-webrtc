@@ -1,4 +1,5 @@
 import UserRepository from './../repositories/userRepository';
+import BlockLogRepository from '../repositories/blockLogRepository';
 import ImagesRepository from './../repositories/imageRepository';
 import { NotFoundUserException } from './../exceptions/users';
 import { NotFoundImagesException } from './../exceptions/images/NotFoundImagesException';
@@ -93,6 +94,22 @@ class MatchingService {
           const partner = await UserRepository.findById(partnerId);
 
           if (!partner) throw new NotFoundUserException();
+
+          // 차단정보 가져오기
+          const partnerBlockLog =
+            await BlockLogRepository.findByUserId(partnerId);
+          const myBlockLog = await BlockLogRepository.findByUserId(
+            currentUser.id,
+          );
+
+          // 내가 차단했거나 상대가 날 차단했으면
+          if (
+            (partnerBlockLog &&
+              partnerBlockLog.blockUserIds.includes(currentUser.id)) ||
+            (myBlockLog && myBlockLog.blockUserIds.includes(partnerId))
+          ) {
+            continue; // 다른 파트너를 찾음
+          }
 
           return { user: partner, socket: partnerSocket };
         }
