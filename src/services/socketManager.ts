@@ -7,12 +7,14 @@ import {
   IceEvent,
   LeaveWebchatEvent,
   OfferEvent,
-  RequestFaceRecognition,
+  RequestFaceRecognitionEvent,
   RespondToIntroduceEvent,
-  RespondFaceRecognition,
+  RespondFaceRecognitionEvent,
   StartMatchingEvent,
+  ReportUserEvent,
 } from '../types/eventParameters';
 import WebRTCService from './webrtcService';
+import ReportService from './reportService';
 
 class SocketManager {
   private io: Server;
@@ -93,7 +95,7 @@ class SocketManager {
     // 화상채팅 도중 얼굴공개 요청을 받음
     socket.on(
       MatchEvents.REQUEST_FACE_RECOGNITION,
-      async ({ userId }: RequestFaceRecognition) => {
+      async ({ userId }: RequestFaceRecognitionEvent) => {
         MatchingService.requestFaceRecognition({ socket, userId });
       },
     );
@@ -101,7 +103,11 @@ class SocketManager {
     // 화상채팅 도중 얼굴공개 요청을 받은 파트너가 응답을 함
     socket.on(
       MatchEvents.RESPOND_FACE_RECOGNITION,
-      async ({ userId, response, receivedTime }: RespondFaceRecognition) => {
+      async ({
+        userId,
+        response,
+        receivedTime,
+      }: RespondFaceRecognitionEvent) => {
         MatchingService.respondFaceRecognition({
           socket,
           userId,
@@ -111,7 +117,13 @@ class SocketManager {
       },
     );
 
-    //todo 차단기능
+    // 화상채팅 도중 유저가 신고를 함
+    socket.on(MatchEvents.REPORT_USER, async ({ userId }: ReportUserEvent) => {
+      ReportService.reportUser({
+        userId,
+        targetId: socket.partnerUserId,
+      });
+    });
   }
 
   private setupWebRTCListener(socket: Socket) {
