@@ -1,3 +1,6 @@
+/**
+ * matching events
+ */
 export type RespondToIntroduceEvent = {
   userId: string;
   response: 'accept' | 'decline';
@@ -15,16 +18,23 @@ export type LeaveWebchatEvent = {
   userId: string;
 };
 
-export type RequestFaceRecognition = {
+export type RequestFaceRecognitionEvent = {
   userId: string;
 };
 
-export type RespondFaceRecognition = {
+export type RespondFaceRecognitionEvent = {
   userId: string;
   response: 'accept' | 'decline';
   receivedTime: Date | string;
 };
 
+export type ReportUserEvent = {
+  userId: string;
+};
+
+/**
+ * webRTC events
+ */
 export type OfferEvent = {
   offer: RTCSessionDescriptionInit;
   roomName: string;

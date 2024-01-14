@@ -17,4 +17,5 @@ export enum MatchEvents {
   FACE_RECOGNITION_REQUEST_DENIED = 'face_recognition_request_denied',
   ALREADY_REQUESTED = 'already_requested',
   RESPOND_IS_TOO_LATE = 'respond_is_too_late',
+  REPORT_USER = 'report_user',
 }
