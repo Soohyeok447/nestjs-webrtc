@@ -78,6 +78,13 @@ class MatchingService {
       // 본인을 제외한 waiting중인 파트너가 없으면 클라이언트를 waitingUsers Set에 저장
       if (!partner) {
         this.waitingUsers.set(userId, socket);
+
+        await LogService.createLog(
+          `유저 <br>
+      socketId: ${socket.id}<br> 
+      userId: ${userId}가 파트너를 찾지 못했기 때문에 <br> 
+      소개매칭 대기풀에 추가됨'`,
+        );
       } else {
         // 파트너를 찾으면 서로 소개 매칭을 잡음
         await this.introduceUsers({
@@ -86,6 +93,7 @@ class MatchingService {
           me: currentUser,
           partner: partner.user,
         });
+
         await LogService.createLog(
           `유저 ${partner.user.id}(${partner.user.nickname})와 <br>유저 ${currentUser.id}(${currentUser.nickname})가 <br> 소개매칭됨`,
         );
@@ -128,6 +136,10 @@ class MatchingService {
           ) {
             continue; // 다른 파트너를 찾음
           }
+
+          await LogService.createLog(
+            `유저 ${currentUser.id}(${currentUser.nickname})가 파트너를 찾았습니다.`,
+          );
 
           return { user: partner, socket: partnerSocket };
         }
