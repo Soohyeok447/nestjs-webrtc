@@ -81,12 +81,12 @@ function updateOnlineUsers({ users, userCount }) {
 }
 
 socket.on('update-waiting-users', (waitingUsers) => {
+  console.log('대기 유저 업데이트');
+
   updateWaitingUsers(waitingUsers);
 });
 
 function updateWaitingUsers(waitingUsers) {
-  const usersArray = Array.from(this.waitingUsers);
-
   waitingUsersList.innerHTML = '';
   waitingUsersCount.innerHTML = `접속 중 - ${usersArray.length}`;
 

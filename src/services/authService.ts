@@ -5,6 +5,10 @@ import { InvalidTokenException } from '../exceptions/auth/InvalidTokenException'
 // import { SignInDTO } from '../controllers/dtos/authDTOs/signInDTO';
 import { RenewTokenDTO } from '../controllers/dtos/authDTOs/renewTokenDTO';
 import UserRepository from '../repositories/userRepository';
+
+//TODO debuging용으로 유저생성시 default 이미지 넣는 용도 추후 관련 로직 삭제
+import ImagesRepository from '../repositories/imageRepository';
+
 import { OnBoardDTO } from '../controllers/dtos/authDTOs/onBoardDTO';
 import UserService from './userService';
 import {
@@ -79,6 +83,13 @@ class AuthService {
         purpose,
         bans: [],
         reported: 0,
+      });
+
+      //TODO debuging용. 추후 삭제
+      await ImagesRepository.create({
+        userId: id,
+        keys: ['dummy'],
+        urls: ['dummy'],
       });
 
       return { accessToken, refreshToken };
