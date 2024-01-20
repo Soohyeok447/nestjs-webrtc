@@ -173,7 +173,23 @@ class MatchingService {
     const userAImages: Images = await ImagesRepository.findByUserId(me.id);
     const userBImages: Images = await ImagesRepository.findByUserId(partner.id);
 
-    if (!userAImages || !userBImages) throw new NotFoundImagesException();
+    if (!userAImages || !userBImages) {
+      if (!userAImages) {
+        await LogService.createLog(
+          `유저 ${me.id}(${me.nickname})의 이미지가 없습니다.<br>
+          NotFoundImagesException`,
+        );
+      }
+
+      if (!userBImages) {
+        await LogService.createLog(
+          `유저 ${partner.id}(${partner.nickname})의 이미지가 없습니다.<br>
+          NotFoundImagesException`,
+        );
+      }
+
+      throw new NotFoundImagesException();
+    }
 
     // 소개 매칭이 되었으므로 waitingUsers Set에 나와 파트너를 제거
     this.waitingUsers.delete(me.id);
