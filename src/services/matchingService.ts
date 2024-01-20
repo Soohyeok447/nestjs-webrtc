@@ -8,6 +8,7 @@ import { Images } from './../models/imagesModel';
 import { Socket } from 'socket.io';
 import { MatchEvents } from '../constants';
 import MatchLogService from './matchLogService';
+import LogService from './logService';
 
 const TIMEOUT_DURATION = 10 * 1000;
 const FACE_REQUEST_TIMEOUT = 1000 * 10;
@@ -41,8 +42,22 @@ class MatchingService {
     if (socket.status !== 'idle') {
       socket.emit(MatchEvents.NOT_IDLE);
 
+      await LogService.createLog(
+        `유저 <br>
+        socketId: ${socket.id} <br>
+        userId: ${userId} <br> 
+        이미 소개매칭 대기중인데 매칭시작시도함'`,
+      );
+
       return;
     }
+
+    await LogService.createLog(
+      `유저 <br>
+      socketId: ${socket.id}<br> 
+      userId: ${userId} <br> 
+      소개매칭 대기 시작'`,
+    );
 
     //소켓의 status를 waiting으로 설정
     this.setSocketStatusToWaiting(socket);
@@ -71,6 +86,9 @@ class MatchingService {
           me: currentUser,
           partner: partner.user,
         });
+        await LogService.createLog(
+          `유저 ${partner.user.id}(${partner.user.nickname})와 <br>유저 ${currentUser.id}(${currentUser.nickname})가 <br> 소개매칭됨`,
+        );
       }
     } catch (error) {
       console.log(error);
@@ -206,6 +224,11 @@ class MatchingService {
     partnerSocket,
     me,
     partner,
+  }: {
+    mySocket: Socket;
+    partnerSocket: Socket;
+    me: User;
+    partner: User;
   }): void {
     if (
       mySocket.connected &&
@@ -233,6 +256,13 @@ class MatchingService {
       MatchLogService.createExpiredMatchLog({
         userIds: [me.id, partner.id],
       });
+
+      // 로그 생성
+      LogService.createLog(
+        `유저1 ${me.id}(${me.nickname})와<br> 
+      유저2 ${partner.id}(${partner.nickname})가 <br> 
+      timeOut으로 인한 소개매칭 취소`,
+      );
 
       console.log('timeOut으로 매칭 실패했습니다. [timeOut 이후]');
       console.log('waitingUsers.size', this.waitingUsers.size);
@@ -308,6 +338,13 @@ class MatchingService {
         userIds: [myUserId, partnerUserId],
       });
 
+      // 로그 생성
+      LogService.createLog(
+        `유저1 ${myUserId}와<br> 
+      유저2 ${partnerUserId}가 <br> 
+      유저1 ${myUserId}의 거절로 인한 소개매칭 취소`,
+      );
+
       console.log('decline되어서 매칭 실패했습니다. [매칭 declined 이후]');
       console.log('waitingUsers.size', this.waitingUsers.size);
       console.log('pendingUsers.size', this.pendingUsers.size);
@@ -346,6 +383,12 @@ class MatchingService {
       MatchLogService.createMatchedMatchLog({
         userIds: [myUserId, partnerUserId],
       });
+
+      LogService.createLog(
+        `유저 ${myUserId}와<br> 
+      유저 ${partnerUserId}가 <br> 
+      매칭 성사됨 화상채팅 시작`,
+      );
 
       // 매칭이 되었으니 pendingUsers Set에서 나와 파트너를 제거
       this.pendingUsers.delete(myUserId);
@@ -411,6 +454,11 @@ class MatchingService {
         userIds: [partnerSocket.partnerUserId, socket.partnerUserId],
       });
 
+      LogService.createLog(
+        `유저 ${socket.id}가 끊겨서<br> 
+      유저 ${socket.partnerUserId}와의 연결이 끊김`,
+      );
+
       // 상대에게 partner_disconnected 이벤트 전송 (다시 매칭 시도)
       if (partnerSocket.connected) {
         partnerSocket.emit(MatchEvents.PARTNER_DISCONNECTED);
@@ -431,6 +479,11 @@ class MatchingService {
     // socket의 status가 waiting인지 확인
     if (socket.status !== 'waiting') {
       socket.emit(MatchEvents.NOT_WAITING);
+
+      LogService.createLog(
+        `유저 ${userId}가<br> 
+      이미 소개매칭중이 아닌데 취소요청을 함`,
+      );
 
       return;
     }
@@ -466,6 +519,12 @@ class MatchingService {
     MatchLogService.createCanceledMatchLog({
       userIds: [userId, mySocket.partnerUserId],
     });
+
+    LogService.createLog(
+      `유저 ${userId}와<br> 
+      유저 ${mySocket.partnerUserId}가 <br> 
+      화상채팅을 종료함`,
+    );
 
     // re match
     this.RequestReMatch(mySocket, partnerSocket);
