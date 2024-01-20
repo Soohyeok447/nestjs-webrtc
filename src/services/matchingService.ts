@@ -385,8 +385,14 @@ class MatchingService {
       this.pendingUsers.delete(partnerUserId);
 
       // 클라이언트에게 match_result false로 emit
-      mySocket.emit(MatchEvents.MATCH_RESULT, { result: false });
-      partnerSocket.emit(MatchEvents.MATCH_RESULT, { result: false });
+      mySocket.emit(MatchEvents.MATCH_RESULT, {
+        result: false,
+        initiator: false,
+      });
+      partnerSocket.emit(MatchEvents.MATCH_RESULT, {
+        result: false,
+        initiator: false,
+      });
 
       // 매치 로그 생성
       MatchLogService.createDeclinedMatchLog({
@@ -432,7 +438,10 @@ class MatchingService {
         result: true,
         initiator: true,
       });
-      partnerSocket.emit(MatchEvents.MATCH_RESULT, { result: true });
+      partnerSocket.emit(MatchEvents.MATCH_RESULT, {
+        result: true,
+        initiator: false,
+      });
 
       // 매치 로그 생성
       MatchLogService.createMatchedMatchLog({
