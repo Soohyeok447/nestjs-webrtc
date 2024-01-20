@@ -59,6 +59,9 @@ class MatchingService {
       소개매칭 대기 시작'`,
     );
 
+    // 대기중인 유저 체크
+    socket.emit('waiting-users', this.waitingUsers);
+
     //소켓의 status를 waiting으로 설정
     this.setSocketStatusToWaiting(socket);
 
