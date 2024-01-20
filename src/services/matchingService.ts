@@ -10,7 +10,7 @@ import { MatchEvents } from '../constants';
 import MatchLogService from './matchLogService';
 import LogService from './logService';
 
-const TIMEOUT_DURATION = 10 * 1000;
+const TIMEOUT_DURATION = 30 * 1000;
 const FACE_REQUEST_TIMEOUT = 1000 * 10;
 
 class MatchingService {
