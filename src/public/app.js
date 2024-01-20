@@ -5,6 +5,8 @@ const logList = document.getElementById('log-list');
 const refreshButton = document.getElementById('refresh');
 const onlineUsersList = document.getElementById('online-users-list');
 const onlineUsersCount = document.getElementById('online-users-count');
+const waitingUsersList = document.getElementById('waiting-users-list');
+const waitingUsersCount = document.getElementById('waiting-users-count');
 
 const timer = document.getElementById('timer');
 
@@ -75,5 +77,22 @@ function updateOnlineUsers({ users, userCount }) {
     const listItem = document.createElement('li');
     listItem.textContent = user;
     onlineUsersList.appendChild(listItem);
+  });
+}
+
+socket.on('update-waiting-users', (waitingUsers) => {
+  updateWaitingUsers(waitingUsers);
+});
+
+function updateWaitingUsers(waitingUsers) {
+  const usersArray = Array.from(this.waitingUsers);
+
+  waitingUsersList.innerHTML = '';
+  waitingUsersCount.innerHTML = `접속 중 - ${usersArray.length}`;
+
+  waitingUsers.forEach((user) => {
+    const listItem = document.createElement('li');
+    listItem.textContent = user;
+    waitingUsersList.appendChild(listItem);
   });
 }
