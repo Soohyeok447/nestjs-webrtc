@@ -15,27 +15,56 @@ import {
 } from '../types/eventParameters';
 import WebRTCService from './webrtcService';
 import ReportService from './reportService';
+import LogService from './logService';
 
 class SocketManager {
   private io: Server;
+  private onlineUsers = new Set();
 
   constructor(io: Server) {
     this.io = io;
   }
 
   public initialize() {
-    this.io.on('connection', (socket: Socket) => {
+    this.io.on('connection', async (socket: Socket) => {
       // console.log(this.io.sockets.adapter.sids);
       console.log(socket.id, '접속');
+      this.onlineUsers.add(socket.id);
+
+      //로그 생성
+      await LogService.createLog(`'${socket.id}' 접속했습니다.`);
+
+      //어드민 페이지 온라인 유저 정보 업데이트
+      this.updateOnlineUsers();
 
       this.setupMatchingListener(socket);
       this.setupWebRTCListener(socket);
 
-      socket.on('disconnect', () => {
+      // 어드민 페이지에 로그 전송
+      await this.sendLogs(socket);
+
+      socket.on('disconnect', async () => {
         console.log(socket.id, '접속 해제');
+
+        this.onlineUsers.delete(socket.id);
+
+        //어드민 페이지 온라인 유저 정보 업데이트
+        this.updateOnlineUsers();
+
+        //로그생성
+        await LogService.createLog(`'${socket.id}' 접속 해제했습니다.`);
 
         MatchingService.handleDisconnect(socket);
       });
+    });
+  }
+
+  private updateOnlineUsers() {
+    const usersArray = Array.from(this.onlineUsers);
+
+    this.io.emit('update-online-users', {
+      users: usersArray,
+      userCount: usersArray.length,
     });
   }
 
@@ -124,6 +153,19 @@ class SocketManager {
         targetId: socket.partnerUserId,
       });
     });
+
+    //어드민 페이지 로그 전송
+    socket.on('request-logs', async () => {
+      await this.sendLogs(socket);
+
+      this.updateOnlineUsers();
+    });
+  }
+
+  private async sendLogs(socket) {
+    const logs = await LogService.findAllLogs();
+
+    socket.emit('send-logs', logs);
   }
 
   private setupWebRTCListener(socket: Socket) {

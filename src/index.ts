@@ -35,10 +35,12 @@ const io = new Server(httpServer, {
   },
 });
 
+app.use('/admin', express.static('src/public'));
 app.use('/socket.io', express.static('node_modules/socket.io/client-dist'));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(helmet());
 
 const corsOptions = {
