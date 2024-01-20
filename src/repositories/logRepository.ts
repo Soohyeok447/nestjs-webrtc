@@ -1,4 +1,4 @@
-import { Log, LogModel } from '../models/LogModel';
+import { Log, LogModel } from '../models/logModel';
 
 class LogRepository {
   public async create(content: string): Promise<Log> {
