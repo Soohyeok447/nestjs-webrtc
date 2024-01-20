@@ -60,7 +60,7 @@ class MatchingService {
     );
 
     // 대기중인 유저 체크
-    socket.emit('update-waiting-users', Array.from(this.waitingUsers));
+    // socket.emit('update-waiting-users', Array.from(this.waitingUsers));
 
     //소켓의 status를 waiting으로 설정
     this.setSocketStatusToWaiting(socket);
@@ -169,6 +169,12 @@ class MatchingService {
     me: User;
     partner: User;
   }) {
+    await LogService.createLog(
+      `유저1 ${me.id}(${me.nickname})과<br>
+      유저2 ${partner.id}(${partner.nickname})가<br> 
+      introduceUsers()를 시작합니다.`,
+    );
+
     // 기존 setTimeOut 타이머 취소
     this.clearTimeoutIfExists(mySocket);
     this.clearTimeoutIfExists(partnerSocket);
@@ -194,6 +200,12 @@ class MatchingService {
       throw new NotFoundImagesException();
     }
 
+    await LogService.createLog(
+      `유저1 ${me.id}(${me.nickname})과<br>
+      유저2 ${partner.id}(${partner.nickname})가<br> 
+      이미지 불러오는데에 문제가 없기 때문에 introduceUsers()를 계속 진행합니다.`,
+    );
+
     // 소개 매칭이 되었으므로 waitingUsers Set에 나와 파트너를 제거
     this.waitingUsers.delete(me.id);
     this.waitingUsers.delete(partner.id);
@@ -208,6 +220,12 @@ class MatchingService {
       user: partner,
       images: userBImages,
     });
+
+    await LogService.createLog(
+      `유저1 ${me.id}(${me.nickname})과<br>
+      유저2 ${partner.id}(${partner.nickname})가<br> 
+      서로 정보를 교환하기 위한 매핑이 완료 됐습니다.`,
+    );
 
     // 서로 파트너의 socket 저장
     mySocket.partnerSocket = partnerSocket;
@@ -228,6 +246,12 @@ class MatchingService {
     // 클라이언트에게 상대방 정보를 전달 introduce_each_user 이벤트를 emit
     mySocket.emit(MatchEvents.INTRODUCE_EACH_USER, userBInfo);
     partnerSocket.emit(MatchEvents.INTRODUCE_EACH_USER, userAInfo);
+
+    await LogService.createLog(
+      `유저1 ${me.id}(${me.nickname})과<br>
+      유저2 ${partner.id}(${partner.nickname})가<br> 
+      introduce_each_user 이벤트를 교환했습니다.`,
+    );
 
     // 매치 로그 생성
     MatchLogService.createPendingMatchLog({
