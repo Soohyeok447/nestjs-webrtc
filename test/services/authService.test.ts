@@ -1,5 +1,7 @@
 import AuthService from '../../src/services/authService';
 import UserRepository from '../../src/repositories/userRepository';
+
+//TODO 디버깅용 추후 삭제
 import ImagesRepository from '../../src/repositories/imageRepository';
 import { Token } from '../../src/types/token';
 import { InvalidTokenException } from '../../src/exceptions/auth/InvalidTokenException';
@@ -102,6 +104,7 @@ describe('AuthService', () => {
 
       const tokens: Token = await AuthService.onBoard(onBoardDTO);
 
+      //TODO 디버깅용 추후 삭제
       mockedImagesRepository.create.mockResolvedValue({
         keys: [],
         urls: [],

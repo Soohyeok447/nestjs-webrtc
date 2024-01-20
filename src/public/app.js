@@ -5,8 +5,8 @@ const logList = document.getElementById('log-list');
 const refreshButton = document.getElementById('refresh');
 const onlineUsersList = document.getElementById('online-users-list');
 const onlineUsersCount = document.getElementById('online-users-count');
-const waitingUsersList = document.getElementById('waiting-users-list');
-const waitingUsersCount = document.getElementById('waiting-users-count');
+// const waitingUsersList = document.getElementById('waiting-users-list');
+// const waitingUsersCount = document.getElementById('waiting-users-count');
 
 const timer = document.getElementById('timer');
 
@@ -80,19 +80,19 @@ function updateOnlineUsers({ users, userCount }) {
   });
 }
 
-socket.on('update-waiting-users', (waitingUsers) => {
-  console.log('대기 유저 업데이트');
+// socket.on('update-waiting-users', (waitingUsers) => {
+//   console.log('대기 유저 업데이트');
 
-  updateWaitingUsers(waitingUsers);
-});
+//   updateWaitingUsers(waitingUsers);
+// });
 
-function updateWaitingUsers(waitingUsers) {
-  waitingUsersList.innerHTML = '';
-  waitingUsersCount.innerHTML = `접속 중 - ${usersArray.length}`;
+// function updateWaitingUsers(waitingUsers) {
+//   waitingUsersList.innerHTML = '';
+//   waitingUsersCount.innerHTML = `접속 중 - ${usersArray.length}`;
 
-  waitingUsers.forEach((user) => {
-    const listItem = document.createElement('li');
-    listItem.textContent = user;
-    waitingUsersList.appendChild(listItem);
-  });
-}
+//   waitingUsers.forEach((user) => {
+//     const listItem = document.createElement('li');
+//     listItem.textContent = user;
+//     waitingUsersList.appendChild(listItem);
+//   });
+// }
