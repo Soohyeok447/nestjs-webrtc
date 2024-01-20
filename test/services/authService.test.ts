@@ -1,5 +1,6 @@
 import AuthService from '../../src/services/authService';
 import UserRepository from '../../src/repositories/userRepository';
+import ImagesRepository from '../../src/repositories/imageRepository';
 import { Token } from '../../src/types/token';
 import { InvalidTokenException } from '../../src/exceptions/auth/InvalidTokenException';
 import { RenewTokenDTO } from '../../src/controllers/dtos/authDTOs/renewTokenDTO';
@@ -10,6 +11,12 @@ import { MOCK_USER } from './constants';
 jest.mock('../../src/repositories/userRepository');
 const mockedUserRepository = UserRepository as jest.Mocked<
   typeof UserRepository
+>;
+
+//TODO 디버깅용 추후 삭제
+jest.mock('../../src/repositories/imageRepository');
+const mockedImagesRepository = ImagesRepository as jest.Mocked<
+  typeof ImagesRepository
 >;
 
 const USER_ID = 'userID';
@@ -94,6 +101,12 @@ describe('AuthService', () => {
       };
 
       const tokens: Token = await AuthService.onBoard(onBoardDTO);
+
+      mockedImagesRepository.create.mockResolvedValue({
+        keys: [],
+        urls: [],
+        userId: 'test',
+      });
 
       expect(tokens).toHaveProperty('accessToken');
       expect(tokens).toHaveProperty('refreshToken');
