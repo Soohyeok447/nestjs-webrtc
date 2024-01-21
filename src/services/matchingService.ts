@@ -304,8 +304,14 @@ class MatchingService {
       this.pendingUsers.delete(partner.id);
 
       //매칭 실패 result를 클라이언트로 emit
-      mySocket.emit(MatchEvents.MATCH_RESULT, { result: false });
-      partnerSocket.emit(MatchEvents.MATCH_RESULT, { result: false });
+      mySocket.emit(MatchEvents.MATCH_RESULT, {
+        result: false,
+        initiator: false,
+      });
+      partnerSocket.emit(MatchEvents.MATCH_RESULT, {
+        result: false,
+        initiator: false,
+      });
 
       // 매치 로그 생성
       MatchLogService.createExpiredMatchLog({
