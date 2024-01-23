@@ -191,7 +191,7 @@ class ImageService {
     }
 
     return {
-      url: `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/resized/${key}`,
+      url: `https://${process.env.CDN_DOMAIN}/resized/${key}`,
       key,
     };
   }
