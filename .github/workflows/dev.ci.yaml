@@ -41,7 +41,7 @@ jobs:
           echo AWS_REGION=${{ secrets.AWS_REGION }} >> .env.development
 
           echo S3_BUCKET_NAME=${{ secrets.DEV_S3_BUCKET_NAME }} >> .env.development
-
+          echo CDN_DOMAIN=${{ secrets.DEV_CDN_DOMAIN }} >> .env.development
 
 
           echo HAZE_API_KEY=${{ secrets.HAZE_API_KEY }} >> .env.test
