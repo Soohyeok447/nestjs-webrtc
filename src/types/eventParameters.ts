@@ -37,15 +37,12 @@ export type ReportUserEvent = {
  */
 export type OfferEvent = {
   offer: RTCSessionDescriptionInit;
-  roomName: string;
 };
 
 export type AnswerEvent = {
   answer: RTCSessionDescriptionInit;
-  roomName: string;
 };
 
 export type IceEvent = {
   ice: RTCIceCandidate;
-  roomName: string;
 };

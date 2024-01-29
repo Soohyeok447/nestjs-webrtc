@@ -113,7 +113,7 @@ class SocketManager {
       },
     );
 
-    // 화상채팅 도중 끊음
+    // 화상채팅 도중 유저가 직접 끊음
     socket.on(
       MatchEvents.LEAVE_WEBCHAT,
       async ({ userId }: LeaveWebchatEvent) => {

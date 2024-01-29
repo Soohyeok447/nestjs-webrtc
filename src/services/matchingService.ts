@@ -9,6 +9,7 @@ import { Socket } from 'socket.io';
 import { MatchEvents } from '../constants';
 import MatchLogService from './matchLogService';
 import LogService from './logService';
+import UserService from './userService';
 
 const TIMEOUT_DURATION = 30 * 1000;
 const FACE_REQUEST_TIMEOUT = 1000 * 10;
@@ -343,6 +344,7 @@ class MatchingService {
       gender: user.gender,
       interests: user.interests,
       purpose: user.purpose,
+      age: UserService.calculateAge(user.birth),
       nickname: user.nickname,
       location: user.location,
       profileUrl: images.urls[0],
