@@ -1,3 +1,5 @@
+import { MatchFilter } from '../constants/matchFilter';
+
 /**
  * matching events
  */
@@ -8,6 +10,7 @@ export type RespondToIntroduceEvent = {
 
 export type StartMatchingEvent = {
   userId: string;
+  filter: MatchFilter;
 };
 
 export type CancelMatchingEvent = {

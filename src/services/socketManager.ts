@@ -75,8 +75,8 @@ class SocketManager {
     // 소개매칭 대기 시작
     socket.on(
       MatchEvents.START_MATCHING,
-      async ({ userId }: StartMatchingEvent) => {
-        MatchingService.startMatching({ socket, userId });
+      async ({ userId, filter }: StartMatchingEvent) => {
+        MatchingService.startMatching({ socket, userId, filter });
       },
     );
 

@@ -6,7 +6,7 @@ import { NotFoundImagesException } from './../exceptions/images/NotFoundImagesEx
 import { User } from './../models/userModel';
 import { Images } from './../models/imagesModel';
 import { Socket } from 'socket.io';
-import { MatchEvents } from '../constants';
+import { MatchEvents, MatchFilter } from '../constants';
 import MatchLogService from './matchLogService';
 import LogService from './logService';
 import UserService from './userService';
@@ -30,14 +30,55 @@ class MatchingService {
   public async startMatching({
     socket,
     userId,
+    filter,
   }: {
     socket: Socket;
     userId: string;
+    filter: MatchFilter;
   }) {
     console.log(
       'startMatching 발생. waitingUsers.size',
       this.waitingUsers.size,
     );
+
+    const { gender, location, minAge, maxAge } = filter;
+
+    // match filter validation
+    if (minAge > maxAge || minAge <= 0) {
+      await LogService.createLog(
+        `유저 <br>
+        socketId: ${socket.id}<br> 
+        userId: ${userId} <br> 
+        filter: ${JSON.stringify(filter)} <br>
+        age 범위가 잘못 됐습니다.`,
+      );
+
+      return;
+    }
+
+    if (!UserService.isValidGender(gender)) {
+      await LogService.createLog(
+        `유저 <br>
+        socketId: ${socket.id}<br> 
+        userId: ${userId} <br> 
+        filter: ${JSON.stringify(filter)} <br>
+        gender가 잘못 됐습니다.`,
+      );
+
+      return;
+    }
+
+    if (!UserService.isValidLocation([location])) {
+      await LogService.createLog(
+        `유저 <br>
+        socketId: ${socket.id}<br> 
+        userId: ${userId} <br> 
+        filter: ${JSON.stringify(filter)} <br>
+        location이 잘못 됐습니다.`,
+      );
+
+      return;
+    }
 
     // socket의 status가 idle인지 확인
     if (socket.status !== 'idle') {
@@ -47,6 +88,7 @@ class MatchingService {
         `유저 <br>
         socketId: ${socket.id} <br>
         userId: ${userId} <br> 
+        filter: ${JSON.stringify(filter)} <br>
         이미 소개매칭 대기중인데 매칭시작시도함'`,
       );
 
@@ -57,6 +99,7 @@ class MatchingService {
       `유저 <br>
       socketId: ${socket.id}<br> 
       userId: ${userId} <br> 
+      filter: ${JSON.stringify(filter)} <br>
       소개매칭 대기 시작'`,
     );
 
@@ -109,7 +152,7 @@ class MatchingService {
 
   /**
    * 매칭 조건에 맞는 본인을 제외한 유저 찾기
-   * TODO 매칭 알고리즘
+   * TODO filter이용한 매칭 알고리즘 구현
    */
   private async findPartner(currentUser: User) {
     for (const [partnerId, partnerSocket] of this.waitingUsers) {
