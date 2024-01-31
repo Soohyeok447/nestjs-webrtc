@@ -1,3 +1,5 @@
+import { MatchFilter } from '../constants/matchFilter';
+
 /**
  * matching events
  */
@@ -8,6 +10,7 @@ export type RespondToIntroduceEvent = {
 
 export type StartMatchingEvent = {
   userId: string;
+  filter: MatchFilter;
 };
 
 export type CancelMatchingEvent = {
@@ -37,15 +40,12 @@ export type ReportUserEvent = {
  */
 export type OfferEvent = {
   offer: RTCSessionDescriptionInit;
-  roomName: string;
 };
 
 export type AnswerEvent = {
   answer: RTCSessionDescriptionInit;
-  roomName: string;
 };
 
 export type IceEvent = {
   ice: RTCIceCandidate;
-  roomName: string;
 };

@@ -75,8 +75,8 @@ class SocketManager {
     // 소개매칭 대기 시작
     socket.on(
       MatchEvents.START_MATCHING,
-      async ({ userId }: StartMatchingEvent) => {
-        MatchingService.startMatching({ socket, userId });
+      async ({ userId, filter }: StartMatchingEvent) => {
+        MatchingService.startMatching({ socket, userId, filter });
       },
     );
 
@@ -113,7 +113,7 @@ class SocketManager {
       },
     );
 
-    // 화상채팅 도중 끊음
+    // 화상채팅 도중 유저가 직접 끊음
     socket.on(
       MatchEvents.LEAVE_WEBCHAT,
       async ({ userId }: LeaveWebchatEvent) => {

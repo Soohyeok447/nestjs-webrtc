@@ -5,3 +5,4 @@ export * from './purpose';
 export * from './matchEvents';
 export * from './webrtcEvents';
 export * from './matchStatus';
+export * from './matchFilter';

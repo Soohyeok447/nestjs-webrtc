@@ -164,6 +164,29 @@ class UserService {
       updatedAt: user.updatedAt,
     };
   }
+
+  // 나이 계산
+  public calculateAge(birth: string): number {
+    // 현재 날짜
+    const currentDate = new Date();
+
+    // 생년월일을 Date 객체로 변환
+    const birthDate = new Date(birth);
+
+    // 현재 나이 계산
+    let age = currentDate.getFullYear() - birthDate.getFullYear();
+
+    // 아직 생일 안지났으면 한 살 빼주기
+    if (
+      currentDate.getMonth() < birthDate.getMonth() ||
+      (currentDate.getMonth() === birthDate.getMonth() &&
+        currentDate.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  }
 }
 
 export default new UserService();
