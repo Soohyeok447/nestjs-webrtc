@@ -1,6 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import MatchingService from './matchingService';
-import { MatchEvents, WebRTCEvents } from '../constants';
+import { MatchEvents, WebRTCEvents, WebchatEvents } from '../constants';
 import {
   AnswerEvent,
   CancelMatchingEvent,
@@ -39,6 +39,8 @@ class SocketManager {
 
       this.setupMatchingListener(socket);
       this.setupWebRTCListener(socket);
+      this.setupWebchatListener(socket);
+      this.setupAdminListener(socket);
 
       // 어드민 페이지에 로그 전송
       await this.sendLogs(socket);
@@ -112,54 +114,6 @@ class SocketManager {
         }
       },
     );
-
-    // 화상채팅 도중 유저가 직접 끊음
-    socket.on(
-      MatchEvents.LEAVE_WEBCHAT,
-      async ({ userId }: LeaveWebchatEvent) => {
-        MatchingService.leaveWebchat({ socket, userId });
-      },
-    );
-
-    // 화상채팅 도중 얼굴공개 요청을 받음
-    socket.on(
-      MatchEvents.REQUEST_FACE_RECOGNITION,
-      async ({ userId }: RequestFaceRecognitionEvent) => {
-        MatchingService.requestFaceRecognition({ socket, userId });
-      },
-    );
-
-    // 화상채팅 도중 얼굴공개 요청을 받은 파트너가 응답을 함
-    socket.on(
-      MatchEvents.RESPOND_FACE_RECOGNITION,
-      async ({
-        userId,
-        response,
-        receivedTime,
-      }: RespondFaceRecognitionEvent) => {
-        MatchingService.respondFaceRecognition({
-          socket,
-          userId,
-          response,
-          receivedTime,
-        });
-      },
-    );
-
-    // 화상채팅 도중 유저가 신고를 함
-    socket.on(MatchEvents.REPORT_USER, async ({ userId }: ReportUserEvent) => {
-      ReportService.reportUser({
-        userId,
-        targetId: socket.partnerUserId,
-      });
-    });
-
-    //어드민 페이지 로그 전송
-    socket.on('request-logs', async () => {
-      await this.sendLogs(socket);
-
-      this.updateOnlineUsers();
-    });
   }
 
   private async sendLogs(socket) {
@@ -187,6 +141,61 @@ class SocketManager {
     // 클라이언트가 ice-candidate 이벤트를 보낼 때 ice data받고 파트너에게 전송
     socket.on(WebRTCEvents.ICE, ({ ice }: IceEvent) => {
       WebRTCService.handleIce({ socket, ice });
+    });
+  }
+
+  private setupWebchatListener(socket: Socket) {
+    // 화상채팅 도중 유저가 직접 끊음
+    socket.on(
+      WebchatEvents.LEAVE_WEBCHAT,
+      async ({ userId }: LeaveWebchatEvent) => {
+        MatchingService.leaveWebchat({ socket, userId });
+      },
+    );
+
+    // 화상채팅 도중 얼굴공개 요청을 받음
+    socket.on(
+      WebchatEvents.REQUEST_FACE_RECOGNITION,
+      async ({ userId }: RequestFaceRecognitionEvent) => {
+        MatchingService.requestFaceRecognition({ socket, userId });
+      },
+    );
+
+    // 화상채팅 도중 얼굴공개 요청을 받은 파트너가 응답을 함
+    socket.on(
+      WebchatEvents.RESPOND_FACE_RECOGNITION,
+      async ({
+        userId,
+        response,
+        receivedTime,
+      }: RespondFaceRecognitionEvent) => {
+        MatchingService.respondFaceRecognition({
+          socket,
+          userId,
+          response,
+          receivedTime,
+        });
+      },
+    );
+
+    // 화상채팅 도중 유저가 신고를 함
+    socket.on(
+      WebchatEvents.REPORT_USER,
+      async ({ userId }: ReportUserEvent) => {
+        ReportService.reportUser({
+          userId,
+          targetId: socket.partnerUserId,
+        });
+      },
+    );
+  }
+
+  private setupAdminListener(socket: Socket) {
+    //어드민 페이지 로그 전송
+    socket.on('request-logs', async () => {
+      await this.sendLogs(socket);
+
+      this.updateOnlineUsers();
     });
   }
 }
