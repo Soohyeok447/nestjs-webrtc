@@ -6,7 +6,7 @@ import { NotFoundImagesException } from './../exceptions/images/NotFoundImagesEx
 import { User } from './../models/userModel';
 import { Images } from './../models/imagesModel';
 import { Socket } from 'socket.io';
-import { MatchEvents, MatchFilter } from '../constants';
+import { MatchEvents, WebchatEvents, MatchFilter } from '../constants';
 import MatchLogService from './matchLogService';
 import LogService from './logService';
 import UserService from './userService';
@@ -41,7 +41,25 @@ class MatchingService {
       this.waitingUsers.size,
     );
 
+    if (!filter) {
+      await LogService.createLog('filter가 정의되지 않았습니다.');
+
+      return;
+    }
+
     const { gender, location, minAge, maxAge } = filter;
+
+    if (!UserService.isValidGender(gender)) {
+      await LogService.createLog(
+        `유저 <br>
+        socketId: ${socket.id}<br> 
+        userId: ${userId} <br> 
+        filter: ${JSON.stringify(filter)} <br>
+        gender가 잘못 됐습니다.`,
+      );
+
+      return;
+    }
 
     // match filter validation
     if (minAge > maxAge || minAge <= 0) {
@@ -51,18 +69,6 @@ class MatchingService {
         userId: ${userId} <br> 
         filter: ${JSON.stringify(filter)} <br>
         age 범위가 잘못 됐습니다.`,
-      );
-
-      return;
-    }
-
-    if (!UserService.isValidGender(gender)) {
-      await LogService.createLog(
-        `유저 <br>
-        socketId: ${socket.id}<br> 
-        userId: ${userId} <br> 
-        filter: ${JSON.stringify(filter)} <br>
-        gender가 잘못 됐습니다.`,
       );
 
       return;
@@ -627,8 +633,8 @@ class MatchingService {
     const partnerSocket = mySocket.partnerSocket;
 
     // 화상채팅 종료이벤트 발생
-    mySocket.emit(MatchEvents.WEBCHAT_ENDED);
-    mySocket.partnerSocket.emit(MatchEvents.WEBCHAT_ENDED);
+    mySocket.emit(WebchatEvents.WEBCHAT_ENDED);
+    mySocket.partnerSocket.emit(WebchatEvents.WEBCHAT_ENDED);
 
     // 매치 로그 생성
     MatchLogService.createCanceledMatchLog({
@@ -673,8 +679,8 @@ class MatchingService {
     // 만약 얼굴공개 요청을 이미 받은 상태면
     if (socket.faceRecognitionRequested) {
       // 이미 얼굴공개 요청을 받음 이벤트 생성
-      socket.emit(MatchEvents.ALREADY_REQUESTED);
-      partnerSocket.emit(MatchEvents.ALREADY_REQUESTED);
+      socket.emit(WebchatEvents.ALREADY_REQUESTED);
+      partnerSocket.emit(WebchatEvents.ALREADY_REQUESTED);
       return;
     }
 
@@ -688,7 +694,7 @@ class MatchingService {
     partnerSocket.faceRecognitionRequested = true;
 
     // 상대에게 얼굴공개요청을 보냄
-    partnerSocket.emit(MatchEvents.REQUEST_FACE_RECOGNITION);
+    partnerSocket.emit(WebchatEvents.REQUEST_FACE_RECOGNITION);
   }
 
   /**
@@ -720,8 +726,8 @@ class MatchingService {
       receivedTime.getTime() + FACE_REQUEST_TIMEOUT
     ) {
       // 응답이 너무 늦었음 이벤트 발생
-      socket.emit(MatchEvents.RESPOND_IS_TOO_LATE);
-      partnerSocket.emit(MatchEvents.RESPOND_IS_TOO_LATE);
+      socket.emit(WebchatEvents.RESPOND_IS_TOO_LATE);
+      partnerSocket.emit(WebchatEvents.RESPOND_IS_TOO_LATE);
       return;
     }
 
@@ -733,15 +739,15 @@ class MatchingService {
     // 얼굴공개 요청이 거절일경우
     if (response === 'decline') {
       // 얼굴공개가 거부됐다는 이벤트 발생
-      socket.emit(MatchEvents.FACE_RECOGNITION_REQUEST_DENIED);
-      partnerSocket.emit(MatchEvents.FACE_RECOGNITION_REQUEST_DENIED);
+      socket.emit(WebchatEvents.FACE_RECOGNITION_REQUEST_DENIED);
+      partnerSocket.emit(WebchatEvents.FACE_RECOGNITION_REQUEST_DENIED);
     }
 
     // 얼굴공개 요청이 수락일경우
     if (response === 'accept') {
       // 얼굴공개를 시작하라는 이벤트 발생
-      socket.emit(MatchEvents.PERFORM_FACE_RECOGNITION);
-      partnerSocket.emit(MatchEvents.PERFORM_FACE_RECOGNITION);
+      socket.emit(WebchatEvents.PERFORM_FACE_RECOGNITION);
+      partnerSocket.emit(WebchatEvents.PERFORM_FACE_RECOGNITION);
     }
   }
 
