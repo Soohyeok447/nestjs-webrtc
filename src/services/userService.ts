@@ -126,9 +126,11 @@ class UserService {
     return DateService.isValidDate(birth);
   }
 
-  // MALE, FEMALE 둘 중 하나여야 함
+  // MALE, FEMALE, ALL 둘 중 하나여야 함
   public isValidGender(gender?: string): boolean {
-    const isValid = !!gender && (gender === 'MALE' || gender === 'FEMALE');
+    const isValid =
+      !!gender &&
+      (gender === 'MALE' || gender === 'FEMALE' || gender === 'ALL');
 
     return isValid;
   }

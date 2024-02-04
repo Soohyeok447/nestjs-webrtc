@@ -128,7 +128,7 @@ describe('UserService', () => {
 
   describe('isValidGender()', () => {
     it('should return true for valid gender', () => {
-      const validGenders: Gender[] = ['FEMALE', 'MALE'];
+      const validGenders: Gender[] = ['FEMALE', 'MALE', 'ALL'];
 
       validGenders.forEach((gender) => {
         expect(UserService.isValidGender(gender)).toBe(true);

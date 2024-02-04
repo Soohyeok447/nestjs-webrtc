@@ -1,4 +1,4 @@
-export const GENDER_LIST = ['MALE', 'FEMALE'] as const;
+export const GENDER_LIST = ['MALE', 'FEMALE', 'ALL'] as const;
 
 /**
  * @swagger
@@ -9,6 +9,7 @@ export const GENDER_LIST = ['MALE', 'FEMALE'] as const;
  *       enum:
  *         - MALE
  *         - FEMALE
+ *         - ALL
  *       description: 성별을 나타내는 열거형.
  *       example: MALE
  */
