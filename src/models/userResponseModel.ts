@@ -19,12 +19,20 @@
  *           type: string
  *           example: 파란하늘은여덟
  *           description: 닉네임.
+ *         birth:
+ *           type: string
+ *           example: 1999-01-01
+ *           description: 닉네임.
  *         location:
  *           $ref: '#/components/schemas/Location'
  *         purpose:
  *           $ref: '#/components/schemas/Purpose'
  *         interests:
  *           $ref: '#/components/schemas/Interests'
+ *         age:
+ *           type: number
+ *           example: 30
+ *           description: 나이
  *         bans:
  *           type: array
  *           items:
@@ -48,4 +56,6 @@
  */
 import { User } from './userModel';
 
-export type UserResponseModel = Omit<User, 'refreshToken'>;
+export type UserResponseModel = Omit<User, 'refreshToken'> & {
+  age: number;
+};
