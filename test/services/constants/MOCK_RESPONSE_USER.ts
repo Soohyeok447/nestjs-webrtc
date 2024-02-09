@@ -10,6 +10,7 @@ export const MOCK_RESPONSE_USER: UserResponseModel = {
   location: ['서울', '경기'],
   interests: ['캠핑', '여행'],
   purpose: '커피한잔',
+  age: 24,
   bans: [],
   reported: 0,
   createdAt,

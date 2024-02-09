@@ -157,6 +157,7 @@ class UserService {
       gender: user.gender,
       nickname: user.nickname,
       birth: user.birth,
+      age: this.calculateAge(user.birth),
       location: user.location,
       purpose: user.purpose,
       interests: user.interests,
