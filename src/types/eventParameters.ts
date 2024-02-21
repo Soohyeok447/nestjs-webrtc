@@ -21,6 +21,10 @@ export type LeaveWebchatEvent = {
   userId: string;
 };
 
+export type WebchatTimeOutEvent = {
+  userId: string;
+};
+
 export type RequestFaceRecognitionEvent = {
   userId: string;
 };
