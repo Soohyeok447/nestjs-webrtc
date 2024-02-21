@@ -12,6 +12,7 @@ import {
   RespondFaceRecognitionEvent,
   StartMatchingEvent,
   ReportUserEvent,
+  WebchatTimeOutEvent,
 } from '../types/eventParameters';
 import WebRTCService from './webrtcService';
 import ReportService from './reportService';
@@ -150,6 +151,14 @@ class SocketManager {
       WebchatEvents.LEAVE_WEBCHAT,
       async ({ userId }: LeaveWebchatEvent) => {
         MatchingService.leaveWebchat({ socket, userId });
+      },
+    );
+
+    // 화상채팅 도중 타임아웃이 발생함
+    socket.on(
+      WebchatEvents.WEBCHAT_TIMEOUT,
+      async ({ userId }: WebchatTimeOutEvent) => {
+        MatchingService.webchatTimeOut({ socket, userId });
       },
     );
 

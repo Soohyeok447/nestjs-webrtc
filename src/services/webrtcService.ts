@@ -1,4 +1,7 @@
 import { WebRTCEvents } from '../constants';
+import MatchingService from './matchingService';
+
+const WEBCHAT_TIMEOUT_DURATION = 1000 * 60 * 10;
 
 class WebRTCService {
   public handleSignalingStarter({ socket }) {
@@ -17,6 +20,25 @@ class WebRTCService {
 
   public handleIce({ socket, ice }) {
     socket.to(socket.room).emit(WebRTCEvents.ICE, { ice });
+
+    const partnerSocket = socket.partnerSocket;
+
+    // 혹여나 소개매칭에서 설정된 timeOut중 해제되지 않은 timeOut이 있다면 초기화
+    if (socket.timeOut) {
+      clearTimeout(socket.timeOut);
+
+      socket.timeOut = null;
+    }
+
+    // webchat 만료를 위한 timeOut 설정
+    socket.timeOut = partnerSocket.timeOut = setTimeout(
+      () =>
+        MatchingService.webchatTimeOut({
+          socket: partnerSocket,
+          userId: socket.partnerUserId,
+        }),
+      WEBCHAT_TIMEOUT_DURATION,
+    );
   }
 }
 

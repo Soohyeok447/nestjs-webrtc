@@ -647,8 +647,51 @@ class MatchingService {
       화상채팅을 종료함`,
     );
 
+    // reset function
+    const resetSocketProperty = (socket: Socket) => {
+      socket.partnerSocket = null;
+      socket.partnerUserId = null;
+      socket.room = null;
+      this.clearTimeoutIfExists(socket);
+      this.setSocketStatusToIdle(socket);
+    };
+
+    // 내 소켓, 파트너 소켓 속성 초기화
+    resetSocketProperty(mySocket);
+    resetSocketProperty(partnerSocket);
+
     // re match
     this.RequestReMatch(mySocket, partnerSocket);
+  }
+
+  /**
+   * 화상채팅 도중 타임아웃이 발생함
+   */
+  public async webchatTimeOut({
+    socket: mySocket,
+    userId,
+  }: {
+    socket: Socket;
+    userId: string;
+  }) {
+    const partnerSocket = mySocket.partnerSocket;
+
+    // 이미 화상채팅이 종료된 상태면 별 다른 일 없이 return
+    if (mySocket.status === 'idle' || partnerSocket.status === 'idle') return;
+
+    // 화상채팅 종료이벤트 발생
+    mySocket.emit(WebchatEvents.WEBCHAT_ENDED);
+    partnerSocket.emit(WebchatEvents.WEBCHAT_ENDED);
+
+    // 매치 로그 생성
+    MatchLogService.createCanceledMatchLog({
+      userIds: [userId, mySocket.partnerUserId],
+    });
+
+    LogService.createLog(
+      `유저 ${userId}와<br> 
+      유저 ${mySocket.partnerUserId}가 화상채팅도중 타임아웃 발생`,
+    );
 
     // reset function
     const resetSocketProperty = (socket: Socket) => {
@@ -662,6 +705,9 @@ class MatchingService {
     // 내 소켓, 파트너 소켓 속성 초기화
     resetSocketProperty(mySocket);
     resetSocketProperty(partnerSocket);
+
+    // re match
+    this.RequestReMatch(mySocket, partnerSocket);
   }
 
   /**
