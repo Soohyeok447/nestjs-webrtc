@@ -661,7 +661,7 @@ class MatchingService {
     resetSocketProperty(partnerSocket);
 
     // re match
-    this.RequestReMatch(mySocket, partnerSocket);
+    // this.RequestReMatch(mySocket, partnerSocket);
   }
 
   /**
@@ -707,7 +707,7 @@ class MatchingService {
     resetSocketProperty(partnerSocket);
 
     // re match
-    this.RequestReMatch(mySocket, partnerSocket);
+    // this.RequestReMatch(mySocket, partnerSocket);
   }
 
   /**
