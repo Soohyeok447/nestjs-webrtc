@@ -521,11 +521,6 @@ class MatchingService {
    * Disconnect 처리
    */
   public async handleDisconnect(socket: Socket) {
-    const user = await UserRepository.findById(
-      socket.partnerSocket.partnerUserId,
-    );
-    const partner = await UserRepository.findById(socket.partnerUserId);
-
     //room에 join한 상태면 room에서 leave함
     if (socket.room) socket.leave(socket.room);
 
@@ -576,8 +571,8 @@ class MatchingService {
 
       LogService.createLog(
         `[유저 disconnected]<br>
-        유저 ${user.nickname}가 끊겨서<br> 
-        유저 ${partner.nickname}이랑 연결이 끊김`,
+        유저 ${socket.nickName}가 끊겨서<br> 
+        유저 ${socket.partnerNickName}이랑 연결이 끊김`,
       );
 
       // 상대에게 partner_disconnected 이벤트 전송 (다시 매칭 시도)
