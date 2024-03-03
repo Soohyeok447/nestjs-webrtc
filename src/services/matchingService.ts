@@ -147,11 +147,12 @@ class MatchingService {
         });
 
         socket.partnerNickName = partner.user.nickname;
+        socket.partnerSocket.partnerNickName = user.nickname;
 
         await LogService.createLog(
           ` <em style="color: blue;">[소개매칭 성공]</em> <br>
           유저1 "${user.nickname}" &<br>
-          유저2 "${partner.user.nickname}"`,
+          유저2 "${socket.partnerNickName}"`,
         );
       }
     } catch (error) {
@@ -501,8 +502,8 @@ class MatchingService {
 
       LogService.createLog(
         `<em style="color: blue;">[화상채팅 시작]</em><br>
-        유저1 "${mySocket.nickName}" <br> 
-        유저2 "${mySocket.partnerNickName}"`,
+        유저 "${mySocket.nickName}" <br> 
+        유저 "${mySocket.partnerNickName}"`,
       );
 
       // 매칭이 되었으니 pendingUsers Set에서 나와 파트너를 제거
@@ -546,6 +547,12 @@ class MatchingService {
     if (socket.status === 'pending' || socket.status === 'matched') {
       const partnerSocket = socket.partnerSocket;
 
+      LogService.createLog(
+        `<em style="color: red;">[유저 disconnected]</em><br>
+        유저 "${socket.nickName}"가 끊겨서<br> 
+        유저 "${socket.partnerNickName}"이랑 연결이 끊김`,
+      );
+
       // status를 idle로 변경
       this.setSocketStatusToIdle(socket);
       this.setSocketStatusToIdle(partnerSocket);
@@ -568,12 +575,6 @@ class MatchingService {
       MatchLogService.createCanceledMatchLog({
         userIds: [partnerSocket.partnerUserId, socket.partnerUserId],
       });
-
-      LogService.createLog(
-        `<em style="color: red;">[유저 disconnected]</em><br>
-        유저 "${socket.nickName}"가 끊겨서<br> 
-        유저 "${socket.partnerNickName}"이랑 연결이 끊김`,
-      );
 
       // 상대에게 partner_disconnected 이벤트 전송 (다시 매칭 시도)
       if (partnerSocket.connected) {
