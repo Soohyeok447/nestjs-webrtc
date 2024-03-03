@@ -33,7 +33,9 @@ class SocketManager {
       this.onlineUsers.add(socket.id);
 
       //로그 생성
-      await LogService.createLog(`'${socket.id}' 접속했습니다.`);
+      await LogService.createLog(
+        `<em style="color: green;">'소켓 ${socket.id}' 접속.</em>`,
+      );
 
       //어드민 페이지 온라인 유저 정보 업데이트
       this.updateOnlineUsers();
@@ -55,7 +57,10 @@ class SocketManager {
         this.updateOnlineUsers();
 
         //로그생성
-        await LogService.createLog(`'${socket.id}' 접속 해제했습니다.`);
+        await LogService.createLog(
+          `<em style="color: green; text-decoration: line-through;">'소켓 ${socket.id}' 접속해제</em>
+`,
+        );
 
         MatchingService.handleDisconnect(socket);
       });
