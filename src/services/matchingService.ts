@@ -40,7 +40,7 @@ class MatchingService {
 
     if (!user) {
       await LogService.createLog(
-        `<em style="color: blue;">[존재하지 않는 User]</em> <br>
+        `<em style="color: red;">[존재하지 않는 User]</em> <br>
         userId: ${userId} <br> `,
       );
 
@@ -62,7 +62,7 @@ class MatchingService {
 
     if (!UserService.isValidGender(gender)) {
       await LogService.createLog(
-        `<em style="color: blue;">[gender가 잘못됨]</em> <br>
+        `<em style="color: red;">[gender가 잘못됨]</em> <br>
         nickName: ${user.nickname} <br>
         filter: ${JSON.stringify(filter)} <br>
         gender가 잘못 됐습니다.`,
@@ -74,7 +74,7 @@ class MatchingService {
     // match filter validation
     if (minAge > maxAge || minAge <= 0) {
       await LogService.createLog(
-        `<em style="color: blue;">[유효하지 않은 age범위]</em> <br>
+        `<em style="color: red;">[유효하지 않은 age범위]</em> <br>
         nickName: ${user.nickname} <br>
         filter: ${JSON.stringify(filter)} <br>
         age 범위가 잘못 됐습니다.`,
@@ -99,7 +99,7 @@ class MatchingService {
       socket.emit(MatchEvents.NOT_IDLE);
 
       await LogService.createLog(
-        `<em style="color: blue;">[Not idle status] </em><br>
+        `<em style="color: red;">[Not idle status] </em><br>
         유저 "${user.nickname}"가 이미 idle 상태가 아님.'`,
       );
 
@@ -241,14 +241,14 @@ class MatchingService {
     if (!userAImages || !userBImages) {
       if (!userAImages) {
         await LogService.createLog(
-          `<em style="color: blue;">[이미지를 찾을 수 없음]</em><br>
+          `<em style="color: red;">[이미지를 찾을 수 없음]</em><br>
         유저 "${me.nickname}"의 이미지가 없습니다.`,
         );
       }
 
       if (!userBImages) {
         await LogService.createLog(
-          `<em style="color: blue;">[이미지를 찾을 수 없음]</em><br>
+          `<em style="color: red;">[이미지를 찾을 수 없음]</em><br>
         유저 "${partner.nickname}"의 이미지가 없습니다.`,
         );
       }
@@ -364,7 +364,7 @@ class MatchingService {
 
       // 로그 생성
       LogService.createLog(
-        `<em style="color: blue;">[소개매칭 timeOut 발생 - 소개매칭 파토]</em><br>
+        `<em style="color: orange;">[소개매칭 timeOut 발생 - 소개매칭 파토]</em><br>
         유저1 "${me.nickname}" <br> 
         유저2 "${partner.nickname}"`,
       );
@@ -452,7 +452,7 @@ class MatchingService {
 
       // 로그 생성
       LogService.createLog(
-        `<em style="color: blue;">[매칭 거부 - 소개매칭 파토]</em><br>
+        `<em style="color: orange;">[매칭 거부 - 소개매칭 파토]</em><br>
         유저 "${mySocket.nickName}"가 거절함<br> 
         상대방 "${mySocket.partnerNickName}"`,
       );
@@ -570,7 +570,7 @@ class MatchingService {
       });
 
       LogService.createLog(
-        `<em style="color: blue;">[유저 disconnected]</em><br>
+        `<em style="color: red;">[유저 disconnected]</em><br>
         유저 "${socket.nickName}"가 끊겨서<br> 
         유저 "${socket.partnerNickName}"이랑 연결이 끊김`,
       );
@@ -597,7 +597,7 @@ class MatchingService {
       socket.emit(MatchEvents.NOT_WAITING);
 
       LogService.createLog(
-        `<em style="color: blue;">[Not waiting status]</em><br>
+        `<em style="color: red;">[Not waiting status]</em><br>
         유저 "${socket.nickName}" 이미 소개매칭중이 아닌데 취소요청을 함`,
       );
 
@@ -637,7 +637,7 @@ class MatchingService {
     });
 
     LogService.createLog(
-      `<em style="color: blue;">[화상채팅 종료 - 유저가 떠남]</em> <br>
+      `<em style="color: orange;">[화상채팅 종료 - 유저가 떠남]</em> <br>
       유저1 "${mySocket.nickName}"가 떠남 <br> 
       유저2 "${mySocket.partnerNickName}"`,
     );
@@ -685,7 +685,7 @@ class MatchingService {
     });
 
     LogService.createLog(
-      `<em style="color: blue;">[화상채팅 timeOut]</em> <br>
+      `<em style="color: orange;">[화상채팅 timeOut]</em> <br>
       유저1 "${mySocket.nickName}"<br> 
       유저2 "${mySocket.partnerNickName}"`,
     );
