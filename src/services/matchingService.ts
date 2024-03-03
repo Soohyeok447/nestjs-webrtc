@@ -36,8 +36,19 @@ class MatchingService {
     userId: string;
     filter: MatchFilter;
   }) {
+    const user = await UserRepository.findById(userId);
+
+    if (!user) {
+      await LogService.createLog(
+        `[존재하지 않는 User] <br>
+        userId: ${userId} <br> `,
+      );
+
+      return;
+    }
+
     console.log(
-      'startMatching 발생. waitingUsers.size',
+      `${userId}의 startMatching 발생. waitingUsers.size`,
       this.waitingUsers.size,
     );
 
@@ -51,9 +62,8 @@ class MatchingService {
 
     if (!UserService.isValidGender(gender)) {
       await LogService.createLog(
-        `유저 <br>
-        socketId: ${socket.id}<br> 
-        userId: ${userId} <br> 
+        `[gender가 잘못됨] <br>
+        nickName: ${user.nickname} <br>
         filter: ${JSON.stringify(filter)} <br>
         gender가 잘못 됐습니다.`,
       );
@@ -64,9 +74,8 @@ class MatchingService {
     // match filter validation
     if (minAge > maxAge || minAge <= 0) {
       await LogService.createLog(
-        `유저 <br>
-        socketId: ${socket.id}<br> 
-        userId: ${userId} <br> 
+        `[유효하지 않은 age범위] <br>
+        nickName: ${user.nickname} <br>
         filter: ${JSON.stringify(filter)} <br>
         age 범위가 잘못 됐습니다.`,
       );
@@ -76,9 +85,8 @@ class MatchingService {
 
     if (!UserService.isValidLocation([location])) {
       await LogService.createLog(
-        `유저 <br>
-        socketId: ${socket.id}<br> 
-        userId: ${userId} <br> 
+        `[유효하지 않은 location] <br>
+        nickName: ${user.nickname} <br>
         filter: ${JSON.stringify(filter)} <br>
         location이 잘못 됐습니다.`,
       );
@@ -91,26 +99,19 @@ class MatchingService {
       socket.emit(MatchEvents.NOT_IDLE);
 
       await LogService.createLog(
-        `유저 <br>
-        socketId: ${socket.id} <br>
-        userId: ${userId} <br> 
-        filter: ${JSON.stringify(filter)} <br>
-        이미 소개매칭 대기중인데 매칭시작시도함'`,
+        `[Not idle status] <br>
+        유저 ${user.nickname}가 이미 idle 상태가 아님.'`,
       );
 
       return;
     }
 
     await LogService.createLog(
-      `유저 <br>
-      socketId: ${socket.id}<br> 
-      userId: ${userId} <br> 
-      filter: ${JSON.stringify(filter)} <br>
-      소개매칭 대기 시작'`,
+      `[소개매칭 대기 시작] <br>
+      유저 ${user.nickname} 소개매칭 대기 시작<br>`,
     );
 
-    // 대기중인 유저 체크
-    // socket.emit('update-waiting-users', Array.from(this.waitingUsers));
+    socket.nickName = user.nickname;
 
     //소켓의 status를 waiting으로 설정
     this.setSocketStatusToWaiting(socket);
@@ -133,10 +134,8 @@ class MatchingService {
         this.waitingUsers.set(userId, socket);
 
         await LogService.createLog(
-          `유저 <br>
-      socketId: ${socket.id}<br> 
-      userId: ${userId}가 파트너를 찾지 못했기 때문에 <br> 
-      소개매칭 대기풀에 추가됨'`,
+          `[소개매칭 대기풀에 추가]<br>
+           유저 ${user.nickname}가 파트너를 찾지 못했기 때문에 소개매칭 대기풀에 추가'`,
         );
       } else {
         // 파트너를 찾으면 서로 소개 매칭을 잡음
@@ -147,8 +146,12 @@ class MatchingService {
           partner: partner.user,
         });
 
+        socket.partnerNickName = partner.user.nickname;
+
         await LogService.createLog(
-          `유저 ${partner.user.id}(${partner.user.nickname})와 <br>유저 ${currentUser.id}(${currentUser.nickname})가 <br> 소개매칭됨`,
+          ` [소개매칭 성공] <br>
+          유저 ${user.nickname} &<br>
+          유저 ${partner.user.nickname}`,
         );
       }
     } catch (error) {
@@ -191,7 +194,10 @@ class MatchingService {
           }
 
           await LogService.createLog(
-            `유저 ${currentUser.id}(${currentUser.nickname})가 파트너를 찾았습니다.`,
+            `[파트너 발견]<br>
+        유저 ${currentUser.nickname}가<br>
+             파트너 ${partner.nickname}를 찾았습니다.
+            `,
           );
 
           return { user: partner, socket: partnerSocket };
@@ -220,9 +226,9 @@ class MatchingService {
     partner: User;
   }) {
     await LogService.createLog(
-      `유저1 ${me.id}(${me.nickname})과<br>
-      유저2 ${partner.id}(${partner.nickname})가<br> 
-      introduceUsers()를 시작합니다.`,
+      `[서버에서 introduceUsers() 실행]<br>
+        유저1 ${me.nickname} & <br>
+        유저2 ${partner.nickname}`,
     );
 
     // 기존 setTimeOut 타이머 취소
@@ -235,26 +241,20 @@ class MatchingService {
     if (!userAImages || !userBImages) {
       if (!userAImages) {
         await LogService.createLog(
-          `유저 ${me.id}(${me.nickname})의 이미지가 없습니다.<br>
-          NotFoundImagesException`,
+          `[이미지를 찾을 수 없음]<br>
+        유저 ${me.nickname}의 이미지가 없습니다.`,
         );
       }
 
       if (!userBImages) {
         await LogService.createLog(
-          `유저 ${partner.id}(${partner.nickname})의 이미지가 없습니다.<br>
-          NotFoundImagesException`,
+          `[이미지를 찾을 수 없음]<br>
+        유저 ${partner.nickname}의 이미지가 없습니다.`,
         );
       }
 
       throw new NotFoundImagesException();
     }
-
-    await LogService.createLog(
-      `유저1 ${me.id}(${me.nickname})과<br>
-      유저2 ${partner.id}(${partner.nickname})가<br> 
-      이미지 불러오는데에 문제가 없기 때문에 introduceUsers()를 계속 진행합니다.`,
-    );
 
     // 소개 매칭이 되었으므로 waitingUsers Set에 나와 파트너를 제거
     this.waitingUsers.delete(me.id);
@@ -270,12 +270,6 @@ class MatchingService {
       user: partner,
       images: userBImages,
     });
-
-    await LogService.createLog(
-      `유저1 ${me.id}(${me.nickname})과<br>
-      유저2 ${partner.id}(${partner.nickname})가<br> 
-      서로 정보를 교환하기 위한 매핑이 완료 됐습니다.`,
-    );
 
     // 서로 파트너의 socket 저장
     mySocket.partnerSocket = partnerSocket;
@@ -298,9 +292,9 @@ class MatchingService {
     partnerSocket.emit(MatchEvents.INTRODUCE_EACH_USER, userAInfo);
 
     await LogService.createLog(
-      `유저1 ${me.id}(${me.nickname})과<br>
-      유저2 ${partner.id}(${partner.nickname})가<br> 
-      introduce_each_user 이벤트를 교환했습니다.`,
+      `[소개매칭 성공 - introduce_each_user 이벤트 교환]<br>
+        유저1 ${me.nickname}<br>
+      유저2 ${partner.nickname}`,
     );
 
     // 매치 로그 생성
@@ -370,9 +364,9 @@ class MatchingService {
 
       // 로그 생성
       LogService.createLog(
-        `유저1 ${me.id}(${me.nickname})와<br> 
-      유저2 ${partner.id}(${partner.nickname})가 <br> 
-      timeOut으로 인한 소개매칭 취소`,
+        `[소개매칭 timeOut 발생 - 소개매칭 파토]<br>
+        유저1 ${me.nickname} <br> 
+        유저2 ${partner.nickname}`,
       );
 
       console.log('timeOut으로 매칭 실패했습니다. [timeOut 이후]');
@@ -403,7 +397,7 @@ class MatchingService {
   /**
    * 소개 매칭에서의 Accept 또는 Decline 처리
    */
-  public handleUserResponse({
+  public async handleUserResponse({
     mySocket,
     partnerSocket,
     myUserId,
@@ -458,9 +452,9 @@ class MatchingService {
 
       // 로그 생성
       LogService.createLog(
-        `유저1 ${myUserId}와<br> 
-      유저2 ${partnerUserId}가 <br> 
-      유저1 ${myUserId}의 거절로 인한 소개매칭 취소`,
+        `[매칭 거부 - 소개매칭 파토]<br>
+        유저 ${mySocket.nickName}가 거절함<br> 
+        상대방 ${mySocket.partnerNickName}`,
       );
 
       console.log('decline되어서 매칭 실패했습니다. [매칭 declined 이후]');
@@ -482,7 +476,7 @@ class MatchingService {
       this.setSocketStatusToMatched(partnerSocket);
 
       //TODO 추후 room정보와 userA, userB의 id 저장 (web RTC 및 logging)
-      const roomName = `room-${mySocket.id}-${partnerSocket.id}`;
+      const roomName = `room - ${mySocket.id} - ${partnerSocket.id}`;
       mySocket.join(roomName);
       partnerSocket.join(roomName);
 
@@ -506,9 +500,9 @@ class MatchingService {
       });
 
       LogService.createLog(
-        `유저 ${myUserId}와<br> 
-      유저 ${partnerUserId}가 <br> 
-      매칭 성사됨 화상채팅 시작`,
+        `[화상채팅 시작]<br>
+        유저1 ${mySocket.nickName} <br> 
+        유저2 ${mySocket.partnerNickName}`,
       );
 
       // 매칭이 되었으니 pendingUsers Set에서 나와 파트너를 제거
@@ -526,7 +520,12 @@ class MatchingService {
   /**
    * Disconnect 처리
    */
-  public handleDisconnect(socket: Socket) {
+  public async handleDisconnect(socket: Socket) {
+    const user = await UserRepository.findById(
+      socket.partnerSocket.partnerUserId,
+    );
+    const partner = await UserRepository.findById(socket.partnerUserId);
+
     //room에 join한 상태면 room에서 leave함
     if (socket.room) socket.leave(socket.room);
 
@@ -552,17 +551,17 @@ class MatchingService {
     if (socket.status === 'pending' || socket.status === 'matched') {
       const partnerSocket = socket.partnerSocket;
 
-      // 상대방 소켓의 status를 idle로 변경
+      // status를 idle로 변경
+      this.setSocketStatusToIdle(socket);
       this.setSocketStatusToIdle(partnerSocket);
 
       // timeOut객체 초기화
+      this.clearTimeoutIfExists(socket);
       this.clearTimeoutIfExists(partnerSocket);
-
-      // 상대방 timeout을 null로 변경
-      partnerSocket.timeOut = null;
 
       // 상대방 room을 null로 변경
       partnerSocket.room = null;
+      socket.room = null;
 
       // 상대방 partnerUserId를 null로 변경
       partnerSocket.partnerUserId = null;
@@ -576,8 +575,9 @@ class MatchingService {
       });
 
       LogService.createLog(
-        `유저 ${socket.id}가 끊겨서<br> 
-      유저 ${socket.partnerUserId}와의 연결이 끊김`,
+        `[유저 disconnected]<br>
+        유저 ${user.nickname}가 끊겨서<br> 
+        유저 ${partner.nickname}이랑 연결이 끊김`,
       );
 
       // 상대에게 partner_disconnected 이벤트 전송 (다시 매칭 시도)
@@ -602,8 +602,8 @@ class MatchingService {
       socket.emit(MatchEvents.NOT_WAITING);
 
       LogService.createLog(
-        `유저 ${userId}가<br> 
-      이미 소개매칭중이 아닌데 취소요청을 함`,
+        `[Not waiting status]<br>
+        유저 ${socket.nickName} 이미 소개매칭중이 아닌데 취소요청을 함`,
       );
 
       return;
@@ -642,15 +642,16 @@ class MatchingService {
     });
 
     LogService.createLog(
-      `유저 ${userId}와<br> 
-      유저 ${mySocket.partnerUserId}가 <br> 
-      화상채팅을 종료함`,
+      `[화상채팅 종료 - 유저가 떠남] <br>
+      유저 ${mySocket.nickName}가 떠남 <br> 
+      유저 ${mySocket.partnerNickName}`,
     );
 
     // reset function
     const resetSocketProperty = (socket: Socket) => {
       socket.partnerSocket = null;
       socket.partnerUserId = null;
+      socket.partnerNickName = null;
       socket.room = null;
       this.clearTimeoutIfExists(socket);
       this.setSocketStatusToIdle(socket);
@@ -689,8 +690,9 @@ class MatchingService {
     });
 
     LogService.createLog(
-      `유저 ${userId}와<br> 
-      유저 ${mySocket.partnerUserId}가 화상채팅도중 타임아웃 발생`,
+      `[화상채팅 timeOut] <br>
+      유저 ${mySocket.nickName}<br> 
+      유저 ${mySocket.partnerNickName}`,
     );
 
     // reset function
