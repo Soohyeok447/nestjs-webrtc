@@ -94,12 +94,15 @@ class SocketManager {
     // 소개매칭 phase에서 Accept 또는 Decline 처리
     socket.on(
       MatchEvents.RESPOND_TO_INTRODUCE,
-      ({ userId: myUserId, response: myResponse }: RespondToIntroduceEvent) => {
+      async ({
+        userId: myUserId,
+        response: myResponse,
+      }: RespondToIntroduceEvent) => {
         const partnerUserId = socket.partnerUserId;
         const partnerSocket = socket.partnerSocket;
 
         if (partnerSocket) {
-          MatchingService.handleUserResponse({
+          await MatchingService.handleUserResponse({
             mySocket: socket,
             partnerSocket,
             myUserId,
