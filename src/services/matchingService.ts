@@ -170,6 +170,7 @@ class MatchingService {
   ) {
     // 매칭 필터에 부합하는지 확인하는 함수
     const isMatch = async (partnerId: string, partnerUser: User) => {
+      // 본인이거나 방금 매칭되었던 파트너는 패스
       if (partnerId === currentUser.id || socket.partnerUserId === partnerId)
         return false;
 
