@@ -16,11 +16,11 @@ const FACE_REQUEST_TIMEOUT = 1000 * 10;
 
 class MatchingService {
   // 소개매칭 대기 및 pending된 User Set
-  private waitingUsers: Map<string, Socket>;
+  private waitingUsers: Map<string, { socket: Socket; user: User }>;
   private pendingUsers: Map<string, Socket>;
 
   constructor() {
-    this.waitingUsers = new Map<string, Socket>();
+    this.waitingUsers = new Map<string, { socket: Socket; user: User }>();
     this.pendingUsers = new Map<string, Socket>();
   }
 
@@ -127,11 +127,11 @@ class MatchingService {
       if (!currentUser) throw new NotFoundUserException();
 
       // 파트너를 찾음
-      const partner = await this.findPartner(currentUser);
+      const partner = await this.findPartner(currentUser, filter, socket);
 
       // 본인을 제외한 waiting중인 파트너가 없으면 클라이언트를 waitingUsers Set에 저장
       if (!partner) {
-        this.waitingUsers.set(userId, socket);
+        this.waitingUsers.set(userId, { socket, user: currentUser });
 
         await LogService.createLog(
           `<em style="color: blue;">[소개매칭 대기풀에 추가]</em><br>
@@ -162,53 +162,66 @@ class MatchingService {
 
   /**
    * 매칭 조건에 맞는 본인을 제외한 유저 찾기
-   * TODO filter이용한 매칭 알고리즘 구현
    */
-  private async findPartner(currentUser: User) {
+  private async findPartner(
+    currentUser: User,
+    filter: MatchFilter,
+    socket: Socket,
+  ) {
+    // 매칭 필터에 부합하는지 확인하는 함수
+    const isMatch = async (partnerId: string, partnerUser: User) => {
+      // 본인이거나 방금 매칭되었던 파트너는 패스
+      if (partnerId === currentUser.id || socket.partnerUserId === partnerId)
+        return false;
+
+      // 매칭 필터 확인
+      const matchesFilter =
+        partnerUser.gender === filter.gender &&
+        partnerUser.location.includes(filter.location) &&
+        UserService.calculateAge(partnerUser.birth) >= filter.minAge &&
+        UserService.calculateAge(partnerUser.birth) <= filter.maxAge;
+      if (!matchesFilter) return false;
+
+      // 차단 정보 확인
+      const [partnerBlockLog, myBlockLog] = await Promise.all([
+        BlockLogRepository.findByUserId(partnerId),
+        BlockLogRepository.findByUserId(currentUser.id),
+      ]);
+      if (
+        partnerBlockLog?.blockUserIds.includes(currentUser.id) ||
+        myBlockLog?.blockUserIds.includes(partnerId)
+      ) {
+        return false;
+      }
+
+      // 유효한 파트너
+      return true;
+    };
+
+    // 대기목록의 유저들을 반복해서 찾기
     for (const [partnerId, partnerSocket] of this.waitingUsers) {
-      try {
-        // 본인은 제외하고 다른 waiting중인 partner들을 find
-        if (
-          partnerId !== currentUser.id &&
-          partnerSocket.status === 'waiting'
-        ) {
-          //TODO 실제 매칭 조건 추가 (gender, interests, purpose 등)
+      // waiting 상태가 아닌 유저면 continue
+      if (partnerSocket.socket.status !== 'waiting') continue;
 
-          const partner = await UserRepository.findById(partnerId);
+      const partner = await UserRepository.findById(partnerId);
 
-          if (!partner) throw new NotFoundUserException();
+      if (!partner) continue;
 
-          // 차단정보 가져오기
-          const partnerBlockLog =
-            await BlockLogRepository.findByUserId(partnerId);
-          const myBlockLog = await BlockLogRepository.findByUserId(
-            currentUser.id,
-          );
+      // 매칭 알고리즘에 부합하는지 확인
+      const matched: boolean = await isMatch(partnerId, partner);
 
-          // 내가 차단했거나 상대가 날 차단했으면
-          if (
-            (partnerBlockLog &&
-              partnerBlockLog.blockUserIds.includes(currentUser.id)) ||
-            (myBlockLog && myBlockLog.blockUserIds.includes(partnerId))
-          ) {
-            continue; // 다른 파트너를 찾음
-          }
+      // 부합할 경우
+      if (matched) {
+        await LogService.createLog(
+          `<em style="color: blue;">[파트너 발견]</em><br>유저 ${currentUser.nickname}가<br>파트너 ${partner.nickname}를 찾았습니다.`,
+        );
 
-          await LogService.createLog(
-            `<em style="color: blue;">[파트너 발견]</em><br>
-            유저 ${currentUser.nickname}가<br>
-             파트너 ${partner.nickname}를 찾았습니다.
-            `,
-          );
-
-          return { user: partner, socket: partnerSocket };
-        }
-      } catch (error) {
-        throw error;
+        // 파트너 정보 return
+        return { user: partner, socket: partnerSocket.socket };
       }
     }
 
-    //본인을 제외하고 찾을 partner가 없으면 null을 return
+    // 만약 매칭할 상대가 없는 경우 null을 return하고 waitingUser set에 포함되도록 함
     return null;
   }
 
@@ -527,7 +540,7 @@ class MatchingService {
 
     // waitingUsers Set에서 삭제
     this.waitingUsers.forEach((userSocket, userId) => {
-      if (userSocket === socket) {
+      if (userSocket.socket === socket) {
         this.waitingUsers.delete(userId);
 
         console.log('나간놈 대기풀에서 삭제');

@@ -13,7 +13,7 @@ class BlockLogRepository {
     }
   }
 
-  public async findByUserId(userId: string): Promise<BlockLog | void> {
+  public async findByUserId(userId: string): Promise<BlockLog | null> {
     try {
       const blockLog = await BlockLogModel.findOne({ userId }).exec();
 
