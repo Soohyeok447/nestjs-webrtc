@@ -23,7 +23,7 @@ import { Gender, Location } from '.';
 
 export interface MatchFilter {
   readonly gender: Gender;
-  readonly location: Location;
+  readonly location: Location[];
   readonly minAge: number;
   readonly maxAge: number;
 }
