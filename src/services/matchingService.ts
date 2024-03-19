@@ -83,7 +83,7 @@ class MatchingService {
       return;
     }
 
-    if (!UserService.isValidLocation([location])) {
+    if (!UserService.isValidLocation(location)) {
       await LogService.createLog(
         `<em style="color: blue;">[유효하지 않은 location]</em> <br>
         nickName: ${user.nickname} <br>
@@ -175,11 +175,16 @@ class MatchingService {
         return false;
 
       // 매칭 필터 확인
-      const matchesFilter =
-        partnerUser.gender === filter.gender &&
-        partnerUser.location.includes(filter.location) &&
-        UserService.calculateAge(partnerUser.birth) >= filter.minAge &&
-        UserService.calculateAge(partnerUser.birth) <= filter.maxAge;
+      const matchesGender =
+        filter.gender === 'ALL' || partnerUser.gender === filter.gender;
+      const matchesLocation = filter.location.some((location) =>
+        partnerUser.location.includes(location),
+      );
+      const age = UserService.calculateAge(partnerUser.birth);
+      const matchesAge = age >= filter.minAge && age <= filter.maxAge;
+
+      const matchesFilter = matchesGender && matchesLocation && matchesAge;
+
       if (!matchesFilter) return false;
 
       // 차단 정보 확인
