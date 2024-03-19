@@ -183,14 +183,26 @@ class MatchingService {
       const matchesGender =
         filter.gender === 'ALL' || partnerUser.gender === filter.gender;
 
-      const matchesLocation = filter.location.some((location) =>
-        partnerUser.location.includes(location),
-      );
+      // location 매칭 조건을 확인하는 별도의 함수
+      const matchesLocation = (filterLocation, partnerLocations) => {
+        if (Array.isArray(filterLocation)) {
+          // filter.location이 배열인 경우, 배열 내 어떤 위치가 partnerUser.location에 포함되는지 확인
+          return filterLocation.some((location) =>
+            partnerLocations.includes(location),
+          );
+        } else {
+          // filter.location이 문자열인 경우, 해당 위치가 partnerUser.location에 포함되는지 확인
+          return partnerLocations.includes(filterLocation);
+        }
+      };
 
       const age = UserService.calculateAge(partnerUser.birth);
       const matchesAge = age >= filter.minAge && age <= filter.maxAge;
 
-      const matchesFilter = matchesGender && matchesLocation && matchesAge;
+      const matchesFilter =
+        matchesGender &&
+        matchesLocation(filter.location, partnerUser.location) &&
+        matchesAge;
 
       if (!matchesFilter) return false;
 
