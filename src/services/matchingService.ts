@@ -127,7 +127,7 @@ class MatchingService {
       if (!currentUser) throw new NotFoundUserException();
 
       // 파트너를 찾음
-      const partner = await this.findPartner(currentUser, filter, socket);
+      const partner = await this.findPartner(currentUser, filter);
 
       // 본인을 제외한 waiting중인 파트너가 없으면 클라이언트를 waitingUsers Set에 저장
       if (!partner) {
@@ -166,13 +166,15 @@ class MatchingService {
   private async findPartner(
     currentUser: User,
     filter: MatchFilter,
-    socket: Socket,
+    //socket: Socket,
   ) {
     // 매칭 필터에 부합하는지 확인하는 함수
     const isMatch = async (partnerId: string, partnerUser: User) => {
-      // 본인이거나 방금 매칭되었던 파트너는 패스
-      if (partnerId === currentUser.id || socket.partnerUserId === partnerId)
-        return false;
+      // 본인이거나
+      if (partnerId === currentUser.id) return false;
+
+      //TODO 방금 매칭되었던 파트너는 패스
+      // if (socket.partnerUserId === partnerId) return false;
 
       // 매칭 필터 확인
       const matchesGender =
