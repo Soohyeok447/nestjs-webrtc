@@ -58,7 +58,10 @@ class MatchingService {
       return;
     }
 
-    const { gender, location, minAge, maxAge } = filter;
+    const { gender, location: rawLocation, minAge, maxAge } = filter;
+
+    // location이 문자열인 경우 배열로 변환하고, 이미 배열이면 그대로 사용
+    const location = Array.isArray(rawLocation) ? rawLocation : [rawLocation];
 
     if (!UserService.isValidGender(gender)) {
       await LogService.createLog(
@@ -179,9 +182,11 @@ class MatchingService {
       // 매칭 필터 확인
       const matchesGender =
         filter.gender === 'ALL' || partnerUser.gender === filter.gender;
+
       const matchesLocation = filter.location.some((location) =>
         partnerUser.location.includes(location),
       );
+
       const age = UserService.calculateAge(partnerUser.birth);
       const matchesAge = age >= filter.minAge && age <= filter.maxAge;
 
