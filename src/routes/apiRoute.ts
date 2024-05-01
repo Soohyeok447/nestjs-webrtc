@@ -4,6 +4,7 @@ import authRouter from './authRoute';
 import healthRouter from './healthRoute';
 import userRouter from './userRoute';
 import blockLogRouter from './blockLogRoute';
+import versionRouter from './versionRoute';
 
 const apiRouter = Router();
 
@@ -46,5 +47,13 @@ apiRouter.use('/auth', authRouter);
  *   description: 차단관리
  */
 apiRouter.use('/blockLog', blockLogRouter);
+
+/**
+ * @swagger
+ * tags:
+ *   name: Version
+ *   description: 버전관리
+ */
+apiRouter.use('/version', versionRouter);
 
 export default apiRouter;
